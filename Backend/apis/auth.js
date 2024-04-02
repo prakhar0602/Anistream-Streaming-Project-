@@ -19,7 +19,7 @@ router.get('/login/:uid', async (req, res) => {
     try {
         let { uid } = req.params;
         let users = await user.find({ uid }).populate('wishlist').exec();
-        let expires=Date.now()+(60*1000)
+        let expires=Date.now()+(24*60*60*1000)
         res.status(200).json({users:users[0],expires}); 
     } catch (error) {
         res.status(500).json({ error: error.message });
