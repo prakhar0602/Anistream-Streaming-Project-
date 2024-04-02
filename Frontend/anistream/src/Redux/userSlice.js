@@ -22,13 +22,12 @@ export const logout=createAsyncThunk('logout',async()=>{
     let response = await axios.get(`${VITE_BACKEND_LINK}/logout`,{
         withCredentials:true
       })
-    return null;
+    return 0;
 })
 
 export async function check_user(){
     axios.defaults.withCredentials = true;
     let response=await axios.get(`${VITE_BACKEND_LINK}/login_status`,{
-        withCredentials:true
     });
     return response.data.login_status;
 }
@@ -42,7 +41,7 @@ export const userSlice=createSlice({
         builder.addCase(logout.fulfilled,(state,action)=>{
             state.user=null
             localStorage.setItem('User','null')
-            console.log((state.user))
+            localStorage.setItem('expiry','0')
         })
     }
 })
