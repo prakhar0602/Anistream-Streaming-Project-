@@ -5,6 +5,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import {select,  set_local_data1,  update_selected,} from "../../../Redux/local_data_Slice";
 import { set_Episode } from "../../../Redux/episodeSlice";
+const {VITE_BACKEND_LINK}=import.meta.env
 const Main_Anime = (props) => {
   let name = props.x.name;
   let navigate = useNavigate();
@@ -32,7 +33,7 @@ const Main_Anime = (props) => {
     let id3 = zz._id;
     let rid = props.x._id;
     let response = await axios.get(
-      `http://localhost:8080/del_rating/${id3}/${rid}/${type}`
+      `${VITE_BACKEND_LINK}/del_rating/${id3}/${rid}/${type}`
     );
     await dispatch(update_selected({ id: rid, type }));
     setRate(null);
@@ -48,7 +49,7 @@ const Main_Anime = (props) => {
       if (rating != 0) {
         let id = props.x._id;
         let type = props.x.type;
-        await axios.post(`http://localhost:8080/add_series_rating`, {
+        await axios.post(`${VITE_BACKEND_LINK}/add_series_rating`, {
           rating,
           type,
           uid,

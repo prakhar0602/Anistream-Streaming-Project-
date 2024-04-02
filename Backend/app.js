@@ -12,8 +12,7 @@ const reviews=require('./apis/reviews')
 const rating=require('./apis/rating')
 const ab=require('./seed')
 const PORT=process.env.PORT || 8080
-app.use(cors({
-    origin: process.env.FRONT_END_KEY,  
+app.use(cors({ 
    credentials:true,
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
  }));

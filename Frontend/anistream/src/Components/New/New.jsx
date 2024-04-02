@@ -5,6 +5,7 @@ import "./New.css";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+const {VITE_BACKEND_LINK}=import.meta.env
 const New = () => {
   let [name, setName] = useState("");
   let [big_image, setBigImage] = useState("");
@@ -64,7 +65,7 @@ const New = () => {
     console.log(encoded);
     try {
       let response = await axios.post(
-        "http://localhost:8080/add_anime",
+        `${VITE_BACKEND_LINK}/add_anime`,
         encoded,
         {
           headers: {
@@ -119,7 +120,7 @@ const New = () => {
     let encoded = new URLSearchParams(fd).toString();
     try {
       let response = await axios.post(
-        "http://localhost:8080/add_anime",
+        `${VITE_BACKEND_LINK}/add_anime`,
         encoded,
         {
           headers: {

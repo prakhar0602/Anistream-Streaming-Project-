@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const {VITE_BACKEND_LINK}=import.meta.env
 
 export function get_user(){
     return JSON.parse(localStorage.getItem('User'))
@@ -9,24 +10,25 @@ let initialState={user:get_user()}
 
 
 function login1(state,action){
-    try{state.user=action.payload;
+    try{
+    state.user=action.payload;
     localStorage.setItem('User',JSON.stringify(action.payload));
+    console.log('done')
 }
     catch(e){
         console.log(e)
     }
 }
 export const logout=createAsyncThunk('logout',async()=>{
-    let response = await axios.get('http://localhost:8080/logout',{
+    let response = await axios.get('https://anistream-streaming-project.onrender.com/logout',{
         withCredentials:true
       })
-      console.log('Done')
     return null;
 })
 
 export async function check_user(){
-    // axios.defaults.withCredentials = true;
-    let response=await axios.get('http://localhost:8080/login_status',{
+    axios.defaults.withCredentials = true;
+    let response=await axios.get(`${VITE_BACKEND_LINK}/login_status`,{
         withCredentials:true
     });
     return response.data.login_status;

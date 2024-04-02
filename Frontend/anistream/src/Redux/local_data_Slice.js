@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import axios from 'axios';
 
-
+const {VITE_BACKEND_LINK}=import.meta.env
 function load_data(){
     if(localStorage.getItem('local_data'))
         return JSON.parse(localStorage.getItem('local_data'))
@@ -26,7 +26,7 @@ function set_selected(state,action){
 export const update_selected=createAsyncThunk('update_selected',async(dt)=>{
     let id=dt.id
     let type=dt.type
-    let response=await axios.get(`http://localhost:8080/get_updated_series/${type}/${id}`)
+    let response=await axios.get(`${VITE_BACKEND_LINK}/get_updated_series/${type}/${id}`)
     return response.data.e;
 })
 
@@ -37,9 +37,9 @@ export const set_local_data1=createAsyncThunk("set_local_data1",async()=>{
         trending:[],
         popular:[]
     }
-    let response=await axios.get('http://localhost:8080/get_series');
+    let response=await axios.get(`${VITE_BACKEND_LINK}/get_series`);
     data.series=response.data;
-    response=await axios.get('http://localhost:8080/get_movies');
+    response=await axios.get(`${VITE_BACKEND_LINK}/get_movies`);
     data.movies=response.data;
     return data;
 })

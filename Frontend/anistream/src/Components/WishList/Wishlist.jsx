@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Template_2 from '../Anime_list/Template_2/Template_2'
 import Template_4 from '../Anime_list/Template_4/Template_4'
-
+const {VITE_BACKEND_LINK}=import.meta.env
 const Wishlist = () => {
   let [series,setSeries]=useState([])
   let [movies,setMovies]=useState([])
@@ -10,7 +10,7 @@ const Wishlist = () => {
   useEffect(()=>{
     async function ab(){
       // console.log(user.wishlist)
-      let response=await axios.post('http://localhost:8080/get_wishlist',{id:JSON.parse(localStorage.getItem('User'))});
+      let response=await axios.post(`${VITE_BACKEND_LINK}/get_wishlist`,{id:JSON.parse(localStorage.getItem('User'))});
       response=response.data;
       console.log(response)
       await setSeries(response.series)

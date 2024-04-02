@@ -48,7 +48,8 @@ function set_episode(state,action){
         'fetchReviews',
         async (file_code) => { 
           try { 
-            const response = await axios.post('http://localhost:8080/get_reviews', {
+            const {VITE_BACKEND_LINK}=import.meta.env
+            const response = await axios.post(`${VITE_BACKEND_LINK}/get_reviews`, {
               file_code
             });
             return response.data.reviews;

@@ -7,6 +7,8 @@ import logo1 from '../../../Assets/loading....gif'
 import { useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+// import Cookies from 'js-cookie'
+const {VITE_BACKEND_LINK}=import.meta.env
 const Login = () => {
     let [email,setEmail]=useState('')
     let [password,setPassword]=useState('')
@@ -20,6 +22,7 @@ const Login = () => {
         setPassword(e.target.value)
       }
       useEffect(()=>{
+        // console.log(Cookies.get())
        },[])
       async function showToast(){
         await toast.success('Login Successfull',{
@@ -31,10 +34,11 @@ const Login = () => {
             e.preventDefault();
             try{
               let uid=(await signIn(email,password)).user.uid;
-              let response=await axios.get(`http://localhost:8080/login/${uid}`,{
+              let response=await axios.get(`${VITE_BACKEND_LINK}/login/${uid}`,{
               withCredentials:true
             });
             response=(response.data)[0]
+            console.log(response)
             dispatch(login(response))
             await showToast();
             }
@@ -43,8 +47,6 @@ const Login = () => {
                 position:'top-center'
               })
             }finally{
-         
-         
              setLoading(false)
             }
             // console.log(toast)

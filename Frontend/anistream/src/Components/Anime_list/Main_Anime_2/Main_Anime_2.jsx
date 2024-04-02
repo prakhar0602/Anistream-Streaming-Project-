@@ -5,6 +5,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { set_local_data1, update_selected } from "../../../Redux/local_data_Slice";
 import { set_Episode } from "../../../Redux/episodeSlice";
+const {VITE_BACKEND_LINK}=import.meta.env
 const Main_Anime_2 = (props) => {
   let name = props.x.name;
   let dispatch = useDispatch();
@@ -19,7 +20,7 @@ const Main_Anime_2 = (props) => {
     async function ab() {
       let id2 = JSON.parse(localStorage.getItem("User"))._id;
       let rates = props.x.rating;
-      let response = await axios.post(`http://localhost:8080/get_wishlist`, {
+      let response = await axios.post(`${VITE_BACKEND_LINK}/get_wishlist`, {
         id: id2,
       });
       response = response.data;
@@ -32,7 +33,7 @@ const Main_Anime_2 = (props) => {
       if (response.includes(props.x._id)) setWishList(true);
       let zz = rates.find((e) => e.user == id2);
       if (zz) setRate(zz.rating);
-      response=await axios.post(`http://localhost:8080/get_wishlist`,{id:id2})
+      response=await axios.post(`${VITE_BACKEND_LINK}/get_wishlist`,{id:id2})
       response=response.data
       if(props.x.type=='s')
       response=response.series
@@ -55,7 +56,7 @@ const Main_Anime_2 = (props) => {
     let id3 = zz._id;
     let rid = props.x._id;
     let response = await axios.get(
-      `http://localhost:8080/del_rating/${id3}/${rid}/${type}`
+      `${VITE_BACKEND_LINK}/del_rating/${id3}/${rid}/${type}`
     );
     await dispatch(update_selected({ id: rid, type }));
     setRate(null);
@@ -71,7 +72,7 @@ const Main_Anime_2 = (props) => {
       if (rating != 0) {
         let id = props.x._id;
         let type = props.x.type;
-        await axios.post(`http://localhost:8080/add_series_rating`, {
+        await axios.post(`${VITE_BACKEND_LINK}/add_series_rating`, {
           rating,
           type,
           uid,
@@ -89,7 +90,7 @@ const Main_Anime_2 = (props) => {
   }
   async function toggleWishlist() {
     let id2 = JSON.parse(localStorage.getItem("User"))._id;
-    let response = await axios.post(`http://localhost:8080/toggle_wishlist`, {
+    let response = await axios.post(`${VITE_BACKEND_LINK}/toggle_wishlist`, {
       x: props.x,
       id: id2,
     });

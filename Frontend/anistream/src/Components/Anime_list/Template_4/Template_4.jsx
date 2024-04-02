@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { select } from '../../../Redux/local_data_Slice';
 import axios from 'axios';
 import { set_Episode } from '../../../Redux/episodeSlice';
+const {VITE_BACKEND_LINK}=import.meta.env
 // import './template.css'
 const Template_4 = (props) => {
     let name=props.series.name;
@@ -24,7 +25,7 @@ const Template_4 = (props) => {
   async function setEpisode(e){
      e.preventDefault();
     let id=props.series.episodes[0]
-    let response=await axios.get(`http://localhost:8080/get_file_code/${id}`)
+    let response=await axios.get(`${VITE_BACKEND_LINK}/get_file_code/${id}`)
     response=response.data;
     console.log(response)
     let a = {
@@ -37,7 +38,7 @@ const Template_4 = (props) => {
   }
   async function toggleWishlist() {
     let id2 = JSON.parse(localStorage.getItem("User"))._id;
-    let response = await axios.post(`http://localhost:8080/toggle_wishlist`, {
+    let response = await axios.post(`${VITE_BACKEND_LINK}/toggle_wishlist`, {
       x: props.series,
       id: id2,
     });

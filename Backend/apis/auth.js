@@ -20,8 +20,9 @@ router.get('/login/:uid', async (req, res) => {
         let { uid } = req.params;
         let users = await user.find({ uid }).populate('wishlist').exec();
         res.cookie('isLoggedIn',"true",{
-            httpOnly:true,
+            httpOnly:false,
             secure:false,
+            expires:Date.now()+24*60*60*1000,
             maxAge:24*60*60*1000
         });
         res.status(200).json(users);
@@ -31,6 +32,7 @@ router.get('/login/:uid', async (req, res) => {
 });
 
 router.get('/login_status', async (req, res) => {
+    console.log(req.cookies)
             if(req.cookies.isLoggedIn)
                 res.status(200).json({ login_status: true });
             else

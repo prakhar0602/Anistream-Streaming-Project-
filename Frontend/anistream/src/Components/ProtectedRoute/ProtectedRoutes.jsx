@@ -7,6 +7,7 @@ const ProtectedRoutes = ({children}) => {
     useEffect(()=>{
         async function ab(){
             let a=await check_user()
+            console.log(a)
            await setRedirect(a);
         }
         ab()

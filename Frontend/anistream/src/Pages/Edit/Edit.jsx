@@ -1,13 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import logo from '../../Assets/loading.gif'
+const {VITE_BACKEND_LINK}=import.meta.env
 const Edit = () => {
   let [series, setSeries] = useState([]);
   let [movies, setMovies] = useState([]);
   let [isLoading,setLoading]=useState(false)
   async function getSeries() {
     setLoading(true)
-    let response = await axios.get("http://localhost:8080/get_series");
+    let response = await axios.get(`${VITE_BACKEND_LINK}/get_series`);
     response = response.data;
     setSeries(response);
     setMovies([]);
@@ -15,7 +16,7 @@ const Edit = () => {
   }
   async function getMovies() {
     setLoading(true)
-    let response = await axios.get("http://localhost:8080/get_movies");
+    let response = await axios.get(`${VITE_BACKEND_LINK}/get_movies`);
     response = response.data;
     setMovies(response);
     setSeries([]);
@@ -23,7 +24,7 @@ const Edit = () => {
   }
   async function rem(type, id) {
     console.log(id)
-    let response = await axios.post("http://localhost:8080/delete_anime", {
+    let response = await axios.post(`${VITE_BACKEND_LINK}/delete_anime`, {
         type,
         id,
     });
@@ -44,7 +45,7 @@ const Edit = () => {
     let encoded = new URLSearchParams(fd).toString();
     try {
       let response = await axios.post(
-        "http://localhost:8080/edit_anime",
+        `${VITE_BACKEND_LINK}/edit_anime`,
         encoded,
         {
           headers: {

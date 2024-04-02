@@ -3,6 +3,7 @@ import { createUser } from "../../../firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+const {VITE_BACKEND_LINK}=import.meta.env
 
 const Signup = () => {
   let [name, setName] = useState("");
@@ -29,7 +30,7 @@ const Signup = () => {
     user.append("username", name);
     user.append("uid", uid);
     let encoded = new URLSearchParams(user).toString();
-    let response = await axios.post("http://localhost:8080/add_user", encoded, {
+    let response = await axios.post(`${VITE_BACKEND_LINK}/add_user`, encoded, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },

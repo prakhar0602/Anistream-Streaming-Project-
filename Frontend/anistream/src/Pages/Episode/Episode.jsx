@@ -7,6 +7,7 @@ import logo1 from '../../Assets/loading....gif'
 import { Link } from "react-router-dom";
 import { useSelector , useDispatch} from "react-redux";
 import { fetchReviews, set_Episode} from "../../Redux/episodeSlice";
+const {VITE_BACKEND_LINK}=import.meta.env
 const Episode = () => {
 
   // Variables Initialization
@@ -42,7 +43,7 @@ const Episode = () => {
   // handle Submit 
   async function handleSubmit(e){
     e.preventDefault();
-    let response=await axios.post('http://localhost:8080/add_review',{name:e.target.name.value,comment:e.target.comment.value,id:files[index].file_code});
+    let response=await axios.post(`${VITE_BACKEND_LINK}/add_review`,{name:e.target.name.value,comment:e.target.comment.value,id:files[index].file_code});
     dispatch(fetchReviews(files[index].file_code))
     e.target.name.value="";
     e.target.comment.value="";
@@ -51,12 +52,12 @@ const Episode = () => {
     let uid=(JSON.parse(localStorage.getItem('User'))._id)
     console.log(uid)
     console.log(id)
-    await axios.get(`http://localhost:8080/toggle/${preop}/${op}/${id}/${uid}`)
+    await axios.get(`${VITE_BACKEND_LINK}/toggle/${preop}/${op}/${id}/${uid}`)
     dispatch(fetchReviews(files[index].file_code))
   }
   // update Reviews
   async function del(did){
-    await axios.post('http://localhost:8080/delete_review',{id,did})
+    await axios.post(`${VITE_BACKEND_LINK}/delete_review`,{id,did})
     dispatch(fetchReviews(files[index].file_code))
   }
   return (
