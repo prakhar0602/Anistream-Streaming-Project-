@@ -1,0 +1,20 @@
+.a1{
+    color:yellowgreen;
+}
+.a2{
+    color:tomato;
+}
+.grey{
+    background-color: rgba(255, 255, 255, 0.411);
+}
+.red{
+    color:red
+}
+.btns{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.btns>button{
+    margin: 0;
+}
