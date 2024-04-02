@@ -6,9 +6,9 @@ const ProtectedRoutes = ({children}) => {
     let [redirect,setRedirect]=useState(true)
     useEffect(()=>{
         async function ab(){
-            let a=await check_user()
-            console.log(a)
-           await setRedirect(a);
+            let a=localStorage.getItem('Expiry') || 0
+            if(a<Date.now())
+           await setRedirect(false);
         }
         ab()
     },[])

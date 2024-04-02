@@ -37,12 +37,14 @@ const Login = () => {
               let response=await axios.get(`${VITE_BACKEND_LINK}/login/${uid}`,{
               withCredentials:true
             });
-            response=(response.data)[0]
-            console.log(response)
-            dispatch(login(response))
+            response=(response.data)
+            localStorage.setItem('Expiry',response.expires)
+            dispatch(login(response.users))
+
             await showToast();
             }
             catch(e){
+              console.log(e.message)
               await toast.error('Wrong Credentials',{
                 position:'top-center'
               })

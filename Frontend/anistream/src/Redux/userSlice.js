@@ -13,14 +13,13 @@ function login1(state,action){
     try{
     state.user=action.payload;
     localStorage.setItem('User',JSON.stringify(action.payload));
-    console.log('done')
 }
     catch(e){
         console.log(e)
     }
 }
 export const logout=createAsyncThunk('logout',async()=>{
-    let response = await axios.get('https://anistream-streaming-project.onrender.com/logout',{
+    let response = await axios.get(`${VITE_BACKEND_LINK}/logout`,{
         withCredentials:true
       })
     return null;

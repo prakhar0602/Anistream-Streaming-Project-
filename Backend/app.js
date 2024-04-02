@@ -13,6 +13,7 @@ const rating=require('./apis/rating')
 const ab=require('./seed')
 const PORT=process.env.PORT || 8080
 app.use(cors({ 
+    origin:['http://localhost:5173'],
    credentials:true,
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
  }));
