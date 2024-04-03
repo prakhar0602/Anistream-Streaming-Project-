@@ -6,9 +6,11 @@ const Series = require('../models/Series');
 const Movies = require('../models/Movies');
 
 router.post('/add_user', async (req, res) => {
-    try {
+    try { 
         let { username, uid, email } = req.body;
-        let x=await user.create({ username, email, type:'user', uid });
+        let y=new Wishlist()
+        await y.save()
+        let x=await user.create({ username, email, type:'user', uid,wishlist:y._id });
         res.status(200).json({ 'msg': 'Registered' });
     } catch (error) {
         res.status(500).json({ error: error.message });

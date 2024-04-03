@@ -13,16 +13,17 @@ const rating=require('./apis/rating')
 const ab=require('./seed')
 const PORT=process.env.PORT || 8080
 app.use(cors({ 
-    origin:['http://localhost:5173'],
+    origin:['https://anistream-streaming-project-vaie.vercel.app','http://localhost:5173'],
    credentials:true,
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    methods:["GET","POST","PATCH","DELETE"],
+    headers: ["Content-Type", "Authorization", "Origin", "Accept"]
  }));
 // ab();
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 mongoose.connect(process.env.MONGO_LINK).then(()=>{
     console.log('Database connected');
-}).catch((error)=>{
+}).catch((error)=>{ 
     console.log(error.message)
     console.log('Database connecting error....');
 })

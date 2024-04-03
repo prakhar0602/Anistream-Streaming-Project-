@@ -61,4 +61,4 @@ async function get_Movies(){
     return x
 }
 
-module.exports={add_Anime,edit_Anime,delete_Anime,get_Series,get_Movies}
+module.exports={add_Anime,edit_Anime,delete_Anime,get_Series,get_Movies} 
