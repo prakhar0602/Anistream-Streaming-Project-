@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { signIn } from '../../../firebase/auth'
 import { login } from '../../../Redux/userSlice'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logo1 from '../../../Assets/loading....gif'
 import { useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -77,6 +77,7 @@ const Login = () => {
               }
             </button>
           </form>
+              <Link to='/signup' className="bg-[#9134ef] hover:bg-[#8142bf] flex justify-center text-white rounded-2xl p-2 mt-5">SignUp</Link>
         </div>
         </div>
       );
