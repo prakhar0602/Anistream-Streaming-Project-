@@ -26,6 +26,7 @@ const View = () => {
         for(let i=0;i<n;i++)
         b.push(data.episodes[i])
         setSelectFiles(b)
+        console.log(b)
         setLoading(false)
       }
         ab();
