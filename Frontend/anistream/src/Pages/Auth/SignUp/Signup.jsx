@@ -48,25 +48,25 @@ const Signup = () => {
   }
 
   return (
-    <div className='w-full min-h-screen flex items-start'>
+    <div className='w-full min-h-screen flex items-center'>
 
-    <div className="w-50 my-auto mx-auto xl:p-20 p-14 shadow-xl rounded-xl bg-black/25">
-    <h2 className="text-center mb-7 text-white text-3xl font-bold">Registeration</h2>
-    <form onSubmit={(e)=>handleSubmit(e)} className="flex flex-col xl:w-80 w-72">
+    <div className="flex flex-col items-center xl:w-50 w-[90%] sm:w-fit   my-auto mx-auto xl:p-20 sm:p-14 p-5 shadow-xl rounded-xl bg-black/25">
+    <h2 className="text-center mb-7 text-white text-3xl w-fit font-bold">Registeration</h2>
+    <form onSubmit={(e)=>handleSubmit(e)} className="flex flex-col sm:w-72 w-full">
       <div className='flex justify-between w-full items-center'>
       <label className="mb-2 text-white "> Username:
       </label>
-        <input className='p-3 mb-3 outline-none bg-white/20 text-white' type="text" name="username" onChange={changeName} required />
+        <input className='sm:p-3 p-2 w-[70%]  mb-3 outline-none bg-white/20 text-white' type="text" name="username" onChange={changeName} required />
       </div>
       <div className='flex justify-between w-full items-center'>
       <label className="mb-2 text-white "> Email:
       </label>
-        <input className='p-3 mb-3 bg-white/20 outline-none text-white' type="email" name="email" onChange={changeEmail} required />
+        <input className='sm:p-3 p-2 w-[70%]  mb-3 outline-none bg-white/20 text-white' type="email" name="email" onChange={changeEmail} required />
       </div>
       <div className='flex justify-between w-full items-center'>
       <label className="mb-2 text-white"> Password:
       </label>
-        <input type="password" name="password"  onChange={changePassword} className="p-3 mb-3 outline-none bg-white/20 text-white" required />
+        <input type="password" name="password"  onChange={changePassword} className="sm:p-3 p-2 w-[70%]  mb-3 outline-none bg-white/20 text-white" required />
       </div>
      
       <button type="submit" className="bg-[#9134ef] hover:bg-[#8142bf] text-white rounded-2xl p-2 mt-5">
