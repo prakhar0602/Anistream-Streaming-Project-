@@ -66,12 +66,12 @@ const Episode = () => {
           title==''?(<div className="h-full w-full flex justify-center items-center text-white">
            <img src={logo} className="w-32" alt="" /> <p className="text-xl ">Loading</p>
             </div>
-            ):(<div className="flex flex-col xl:flex-row m-0 lg:p-32 p-5 justify-around min-h-screen w-screen">
+            ):(<div className="flex flex-col xl:flex-row m-0 lg:p-32 p-5 gap-10 min-h-screen w-fit">
 
        <div className="flex flex-col items-start">
         {
           iframeCode ? (
-            <div className="bg-[#6718c2] text-white text-bold w-[calc(100vw-40px)] lg:w-full">
+            <div className="bg-[#6718c2] text-white text-bold w-[calc(100vw-40px)] max-w-[888px] lg:w-full">
               <div className='xl:w-[888px] lg:h-[500px] w-full h-[calc(100vw*0.5125)] ' dangerouslySetInnerHTML={{ __html: iframeCode }} />
                 <div className="flex flex-col lg:p-5 p-2 gap-3">
                   <p className="m-0 lg:text-3xl text-xl font-bold ">{title}</p>
@@ -150,6 +150,8 @@ const Episode = () => {
           </div>
         </div>
       </div>
+      {
+        files.length>1?(
       <div className="flex flex-col items-center lg:w-72 w-full">
         <p className="text-3xl text-white w-full text-center pb-5 border-b-2">Episodes</p>
         <div className="flex flex-col gap-2 h-[calc(100vh-200px)] no-scrollbar overflow-y-scroll mt-5">
@@ -174,7 +176,7 @@ const Episode = () => {
             ))
           }
         </div>
-      </div> 
+      </div>):(<span></span>)} 
        </div>
        )}
     </div>
