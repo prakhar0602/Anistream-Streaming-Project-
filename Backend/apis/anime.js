@@ -1,6 +1,6 @@
 const express=require('express');
 const router=express.Router();
-const { add_Anime, edit_Anime, delete_Anime, get_Series, get_Movies } = require('../functions/anime_operations');
+const { add_Anime, edit_Anime, delete_Anime, get_Series, get_Movies,searchQuery } = require('../functions/anime_operations');
 const Episodes = require('../models/Episode');
 const { default: axios } = require('axios');
 
@@ -47,10 +47,20 @@ router.post('/get_info',async(req,res)=>{
     for(i of eps){
         let response=await axios.get(`https://api.streamwish.com/api/file/info?key=${process.env.API_KEY}&file_code=${i.file_code}`)
             let x=response.data.result[0]
-
+ 
         info.push(x)
     }
     res.status(200).json({info})
+})
+router.get('/search/:query',async(req,res)=>{
+    try{
+        const {query} = req.params;
+        let results=await searchQuery(query);
+        res.status(200).json({bool:true,results});
+    }
+    catch(e){
+        res.status(200).json({bool:false});
+    }
 })
 
 module.exports=router; 

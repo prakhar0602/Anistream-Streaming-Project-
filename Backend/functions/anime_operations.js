@@ -60,5 +60,16 @@ async function get_Movies(){
     let x=await Movies.find().populate('rating episodes').exec();
     return x
 }
+async function searchQuery(query){
+    let results={series:[],movies:[]};
+    if(query.length==0)
+        return results;
+    let all_series=await Series.find().populate('rating episodes').exec();
+    let all_movies=await Movies.find().populate('rating episodes').exec();
+    let series = all_series.filter((x)=>x.name.toLowerCase().includes(query.toLowerCase()))
+    let movies = all_movies.filter((x)=>x.name.toLowerCase().includes(query.toLowerCase()))
+    results = {series,movies}
+    return results;
+}
 
-module.exports={add_Anime,edit_Anime,delete_Anime,get_Series,get_Movies} 
+module.exports={add_Anime,edit_Anime,delete_Anime,get_Series,get_Movies,searchQuery} 
