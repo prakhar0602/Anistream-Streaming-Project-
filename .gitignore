@@ -2,5 +2,6 @@ Backend/node_modules
 Backend/.env
 Backend/package-lock.json
 Frontend/anistream/package-lock.json
+Frontend/package-lock.json
 Frontend/anistream/.env
 Frontend/anistream/node_modules

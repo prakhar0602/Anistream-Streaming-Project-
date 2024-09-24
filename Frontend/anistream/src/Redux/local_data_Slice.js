@@ -11,7 +11,8 @@ function load_data(){
             trending:[],
             popular:[],
             most_latest:null,
-            selected_anime:null
+            selected_anime:null,
+            query_results:null
     }
 }
 
@@ -21,6 +22,10 @@ let initialState=load_data();
 // Defining the selected Anime
 function set_selected(state,action){
     state.selected_anime=action.payload;
+    localStorage.setItem('local_data',JSON.stringify(state))
+}
+function set_results(state,action){
+    state.query_results=action.payload;
     localStorage.setItem('local_data',JSON.stringify(state))
 }
 export const update_selected=createAsyncThunk('update_selected',async(dt)=>{
@@ -49,6 +54,7 @@ export const localSlice=createSlice({
     initialState,
     reducers:{
         select:(state,action)=>set_selected(state,action),
+        setResults:(state,action)=>set_results(state,action)
     },
     extraReducers:(builder)=>{
         builder.addCase(set_local_data1.fulfilled,(state,action)=>{
@@ -63,5 +69,5 @@ export const localSlice=createSlice({
     }
 })
 
-export const{select}=localSlice.actions
+export const{select,setResults}=localSlice.actions
 export default localSlice.reducer

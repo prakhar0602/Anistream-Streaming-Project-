@@ -17,6 +17,7 @@ import ProtectedRoutes from './Components/ProtectedRoute/ProtectedRoutes'
 import Edit from './Pages/Edit/Edit'
 import { ToastContainer } from 'react-toastify'
 import PrivateRoutes from './Components/ProtectedRoute/PrivateRoutes'
+import Results from './Components/Results/Results'
 function App() {
   return (
     <div className='bg-gradient-to-b from-[#160037] via-[#4A1F80] via-[#420088] to-[#390059] min-h-screen w-full' >
@@ -34,6 +35,7 @@ function App() {
         <Route path="/view" element={<View/>} />
         <Route path="/episode-view" element={<Episode/>} />
         <Route path="/wishlist" element={<Wishlist/>} />
+        <Route path="/results" element={<Results/>} />
       </Routes>
       </Provider>
       </div>
