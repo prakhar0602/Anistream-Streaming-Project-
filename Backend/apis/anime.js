@@ -19,13 +19,13 @@ router.get('/get_movies',async(req,res)=>{
 router.post('/delete_anime',async(req,res)=>{
     let{id,type}=req.body;
     await delete_Anime(id,type)
-    res.status(200).json({'msg':'Deleted'}) 
+    res.status(200).json({'msg':'Deleted'})
 })
 
 router.post('/edit_anime',async(req,res)=>{
     let {name,cover_image,big_image,desc,fld_id,type,nseasons,nepisodes,id}=req.body;
     await edit_Anime(name,cover_image,big_image,desc,fld_id,type,nseasons,nepisodes,id)
-    res.status(200).json({data:'Data updated'});
+    res.status(200).json({data:'Data updated'}); 
 })
 
 router.post('/add_anime',async(req,res)=>{
@@ -35,10 +35,15 @@ router.post('/add_anime',async(req,res)=>{
 })
 
 router.get('/get_file_code/:id',async(req,res)=>{
-    let{id}=req.params;
-    let x=await Episodes.findById(id);
-    x=x.file_code
-    res.status(200).json(x)
+    try{
+        let{id}=req.params;
+        let x=await Episodes.findById(id);
+        x=x.file_code
+        res.status(200).json(x)
+    }
+    catch(e){
+        console.log(e.message)
+    }
 })
 
 router.post('/get_info',async(req,res)=>{

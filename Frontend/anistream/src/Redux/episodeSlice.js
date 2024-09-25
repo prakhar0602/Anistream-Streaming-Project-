@@ -27,7 +27,6 @@ function set_episode(state,action){
   const {index,files}=action.payload;
   state.index=index
   if(files){
-
     state.files=files
   }
   let a = [];

@@ -1,12 +1,8 @@
 import React from 'react'
-import image from '../../../Assets/test.jpg'
 import {Link, useNavigate} from 'react-router-dom'
 import { useDispatch } from 'react-redux';
 import { select } from '../../../Redux/local_data_Slice';
-import axios from 'axios';
 import { set_Episode } from '../../../Redux/episodeSlice';
-const {VITE_BACKEND_LINK}=import.meta.env
-// import './template.css'
 const Template_2 = (props) => {
     let name=props.series.name;
     let type="Series"
@@ -22,15 +18,12 @@ const Template_2 = (props) => {
   }
   async function setEpisode(e){
      e.preventDefault();
-    let id=props.series.episodes[0]
-    let response=await axios.get(`${VITE_BACKEND_LINK}/get_file_code/${id}`)
-    response=response.data;
-    console.log(response)
+    let file=props.series.episodes[0]
     let a = {
       index: 0,
-      fld_id: props.series.fld_id,
-      file_code: response,
+      files: props.series.episodes
     };
+    console.log(a)
     await dispatch(set_Episode(a));
     navigate("/episode-view");
   }
