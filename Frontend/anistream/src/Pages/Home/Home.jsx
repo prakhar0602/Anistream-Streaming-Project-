@@ -69,7 +69,7 @@ const Home = () => {
           {
             
             series.map((s,index)=>(
-              <Link to="/view" state={{data:s}}><Template series={s} key={s.fld_id}/></Link>
+              <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
               ))
             }
         </div>
