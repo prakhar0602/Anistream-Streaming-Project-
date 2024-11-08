@@ -26,7 +26,7 @@ const Nav = () => {
 
     }
   return (
-    <div className="bg-black/30 flex lg:flex-row flex-col lg:w-full lg:justify-around items-center p-2 gap-3 xl:fixed z-40 top-0">
+    <div className="bg-black/30 flex lg:flex-row flex-col lg:w-full lg:justify-around items-center p-2 gap-3 xl:fixed z-40 top-0 ">
         <div className='flex justify-between w-full lg:w-fit items-center'>
         <div className="flex item-center lg:gap-5 gap-3">
             <img className='lg:h-16 h-14' src={logo} alt="Icon" />

@@ -2,7 +2,7 @@
 import {Routes,Route} from 'react-router-dom'
 import Nav from './Components/Navbar/Nav'
 import Wishlist from './Components/WishList/Wishlist'
-import New from './Components/New/New'
+import Register_Series from './Pages/New/Resgister_Series'
 import View from './Pages/Anime_View/View'
 import Episode from './Pages/Episode/Episode'
 import Signup from './Pages/Auth/SignUp/Signup'
@@ -18,6 +18,7 @@ import Edit from './Pages/Edit/Edit'
 import { ToastContainer } from 'react-toastify'
 import PrivateRoutes from './Components/ProtectedRoute/PrivateRoutes'
 import Results from './Components/Results/Results'
+import Resgister_Series from './Pages/New/Resgister_Series'
 function App() {
   return (
     <div className='bg-gradient-to-b from-[#160037] via-[#4A1F80] via-[#420088] to-[#390059] min-h-screen w-full' >
@@ -30,7 +31,7 @@ function App() {
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/" element={<ProtectedRoutes><Home /> </ProtectedRoutes>} />
         <Route path="/genres" element={<ProtectedRoutes><Genres/></ProtectedRoutes>} />
-        <Route path="/new" element={<PrivateRoutes><New/></PrivateRoutes>} />
+        <Route path="/new" element={<PrivateRoutes><Resgister_Series/></PrivateRoutes>} />
         <Route path="/edit" element={<PrivateRoutes><Edit/></PrivateRoutes>} />
         <Route path="/view" element={<View/>} />
         <Route path="/episode-view" element={<Episode/>} />
