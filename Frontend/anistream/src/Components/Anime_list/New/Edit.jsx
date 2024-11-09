@@ -65,7 +65,7 @@ const Edit = () => {
            <img src={logo} className="w-32" alt="" /> <p className="text-xl ">Loading</p>
             </div>
             ):(
-    <div className="w-screen py-32 min-h-screen flex flex-col items-center justify-center">
+    <div className="w-full py-32 min-h-screen flex flex-col items-center justify-center">
       <div className="flex">
         <button
           onClick={() => getSeries()}

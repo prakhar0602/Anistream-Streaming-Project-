@@ -104,7 +104,7 @@ const Resgister_Series = () => {
                         </button>
                         <button
                             onClick={()=>toggleUploadType(4)}
-                            className="hover:bg-gradient-to-r text-white hover:from-[#be51ca] hover:to-[#753eb9] inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-gradient-to-r from-[#be51caac] to-[#763eb9a7]">
+                            className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]">
                                 <ion-icon name="sync"></ion-icon>Edit
                         </button>
                     </div>
