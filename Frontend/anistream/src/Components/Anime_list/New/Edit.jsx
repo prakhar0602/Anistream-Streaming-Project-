@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import logo from '../../Assets/loading.gif'
+import logo from '../../../Assets/loading.gif'
 const {VITE_BACKEND_LINK}=import.meta.env
 const Edit = () => {
   let [series, setSeries] = useState([]);

@@ -6,10 +6,14 @@ import { useSelector } from 'react-redux';
 import LoadingScreen from '../../Components/LoadingScreen';
 import "./New.css";
 import Form from '../../Components/Anime_list/New/Form';
+import Sync from '../../Components/Anime_list/New/Sync';
+import Edit from '../../Components/Anime_list/New/Edit';
 
 const Resgister_Series = () => {
     const [showFileUpload,setFileUpload]    = useState(false);
     const [showURLUpload,setURLUpload]      = useState(false);
+    const [showSync,setShowSync]            = useState(false);
+    const [showEdit,setShowEdit]            = useState(false);
     const [showForm,setForm]                = useState(false);
     const [name,setName]                    = useState('');
     const [fld_id, setFld_id]               = useState("");
@@ -36,12 +40,29 @@ const Resgister_Series = () => {
         if(category==1){
             setFileUpload(!showFileUpload);
             setURLUpload(false);
+            setShowSync(false);
+            setShowEdit(false);
         }
-        else{
+        else if(category==2){
             setURLUpload(!showURLUpload);
             setFileUpload(false);
+            setShowSync(false);
+            setShowEdit(false);
+        }
+        else if(category==3){
+            setURLUpload(false);
+            setFileUpload(false);
+            setShowEdit(false);
+            setShowSync(!showSync);
+        }
+        else{
+            setURLUpload(false);
+            setFileUpload(false);
+            setShowEdit(!showEdit);
+            setShowSync(false);
         }
     }
+
   return (
     <div className='w-full max-w-full pt-24 pb-3'>
         {
@@ -74,6 +95,18 @@ const Resgister_Series = () => {
                     <div className='w-full flex gap-14 justify-center'>
                         <button onClick={()=>toggleUploadType(1)}className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]">Upload Files</button>
                         <button onClick={()=>toggleUploadType(2)} className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]">Upload By URL</button>
+                        
+                        <button className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]" onClick={()=>toggleUploadType(3)} >
+                            <p className='flex justify-center items-center gap-1'>
+                                <ion-icon name="sync"></ion-icon>
+                                Sync
+                            </p>
+                        </button>
+                        <button
+                            onClick={()=>toggleUploadType(4)}
+                            className="hover:bg-gradient-to-r text-white hover:from-[#be51ca] hover:to-[#753eb9] inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-gradient-to-r from-[#be51caac] to-[#763eb9a7]">
+                                <ion-icon name="sync"></ion-icon>Edit
+                        </button>
                     </div>
 
                     <div>
@@ -85,6 +118,16 @@ const Resgister_Series = () => {
                         {
                             showURLUpload?(
                                 <URLUpload as={as} fld_id={fld_id}/>
+                            ):(<span></span>)
+                        }
+                        {
+                            showSync?(
+                                <Sync setLoading={setLoading}/>
+                            ):(<span></span>)
+                        }
+                        {
+                            showEdit?(
+                                <Edit setLoading={setLoading}/>
                             ):(<span></span>)
                         }
                     </div>
