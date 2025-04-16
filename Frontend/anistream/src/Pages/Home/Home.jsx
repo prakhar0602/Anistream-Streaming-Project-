@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { set_local_data1 } from '../../Redux/local_data_Slice'
 import { select } from '../../Redux/local_data_Slice'
 import logo from '../../Assets/loading.gif'
+import Genre from '../../Components/Genre_Template/Genre'
 const Home = () => {
 
   let dispatch=useDispatch();
@@ -31,20 +32,52 @@ const Home = () => {
           <Main_Anime x={most_latest}/>
           ):(<p></p>)
         }
-        <div className="lg:px-12 lg:py-7 p-5">
-          <p className='lg:text-3xl text-2xl lg:mb-8 mb-4'>Anime Series</p>
-          <div className='flex gap-5 max-w-full w-full h-fit p-4 no-scrollbar overflow-x-scroll overflow-auto'>
+        <div className="lg:px-10 lg:py-7 p-5">
+          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
           {
-            
+            series.map((s,index)=>(
+             <Template series={s} key={s.fld_id}/>
+              ))
+            }
+        </div>
+      </div>
+        <div className="lg:px-10 lg:py-7 p-5">
+          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+          {
             series.map((s,index)=>(
               <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
               ))
             }
         </div>
       </div>
-      <div className="lg:p-12 p-5"> 
-          <p className='lg:text-3xl text-2xl lg:mb-8 mb-4'>Anime Movies</p>
-          <div className='flex gap-5 max-w-full w-full h-fit p-4 no-scrollbar overflow-x-scroll overflow-auto'>
+
+      <div className="lg:px-10 lg:py-7 p-5">
+          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Genres</p>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+          {
+            series.map((s,index)=>(
+              <Link to="/view" onClick={()=>dispatch(select(s))}><Genre title="Heyt" image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMaONpgprNw2krJagQB6YspO2oYwQsg_96Fw&s" /></Link>
+              ))
+            }
+        </div>
+      </div>
+
+
+        <div className="lg:px-10 lg:py-7 p-5">
+          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Series</p>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+          {
+            series.map((s,index)=>(
+              <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+              ))
+            }
+        </div>
+      </div>
+      <div className="lg:px-10 lg:py-7 p-5"> 
+          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Movies</p>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
           {
             
             movies.map((s,index)=>(
@@ -53,7 +86,7 @@ const Home = () => {
             }
         </div>
       </div>
-      <div className="lg:p-12 p-5">
+      {/* <div className="lg:p-12 p-5">
           <p className='lg:text-3xl text-2xl lg:mb-8 mb-4'>Trending</p>
           <div className='flex xl:flex-col overflow-scroll no-scrollbar gap-8 lg:p-4 p-1 lg:mx-8 mx-3'>
           {
@@ -73,11 +106,20 @@ const Home = () => {
               ))
             }
         </div>
-      </div>
+      </div> */}
     </div>
   )
   }
             </div>
+
+
+  // <div>
+  //   {
+  //     series.map((x,i)=>(
+  //       <Template series={x}/>
+  //     ))
+  //   }
+  // </div>
   )
 }
 

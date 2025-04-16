@@ -1,11 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
-
-const Sync = (props) => {
+let {VITE_BACKEND_LINK} = import.meta.env;
+const Sync = () => {
     const [folders,setFolders] = useState([]);
     const user = useSelector((state)=>state.user.user);
-    const setLoading=props.setLoading;
     async function sync() {
         if(user.type!='admin'){
           toast.warning('Request Rejected',{
@@ -44,7 +43,6 @@ const Sync = (props) => {
           })
           return
         }
-        setLoading(true)
         let fd = new FormData();
         fd.append("name", e.target.name.value);
         fd.append("cover_image", e.target.cover_image.value);
@@ -54,6 +52,7 @@ const Sync = (props) => {
         fd.append("nseasons", e.target.nseasons.value);
         fd.append("nepisodes", e.target.nepisodes.value);
         fd.append("type", e.target.type.value);
+        fd.append("userID", user._id);
         let encoded = new URLSearchParams(fd).toString();
         try {
           let response = await axios.post(
@@ -70,7 +69,6 @@ const Sync = (props) => {
         }
         let a = folders.filter((ee) => ee.fld_id != e.target.fld_id.value);
         setFolders(a);
-        setLoading(false)
       }
 
 
@@ -89,10 +87,8 @@ const Sync = (props) => {
       }
 
     useEffect(()=>{
-        setLoading(true)
         console.log('started')
         sync();
-        setLoading(false)
     },[]);
     return (
     <div>
@@ -123,8 +119,8 @@ const Sync = (props) => {
                     type="text"
                     id="name"
                     name="name"
-                    value={folder.name}
-                    disabled
+                    placeholder={folder.name}
+                    required
                     />
                 </div>
                 <div className="flex w-full justify-between items-center">
@@ -200,7 +196,6 @@ const Sync = (props) => {
                     type="text"
                     id="nepisodes"
                     name="nepisodes"
-                    onChange={(e) => changeepisodes(e)}
                     />
                 </div>
                 <div className="flex w-full justify-between items-center">
@@ -215,7 +210,6 @@ const Sync = (props) => {
                     type="text"
                     id="nseasons"
                     name="nseasons"
-                    onChange={(e) => changeSeasons(e)}
                     />
                 </div>
                 <div className="flex w-full justify-between items-center">
@@ -257,14 +251,14 @@ const Sync = (props) => {
                 </div>
                 <div className="flex justify-between items-center gap-[20px]">
                   <button
-                    className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                    className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-white/20"
                     type="button"
                     onClick={() => rem(i,index)}
                     >
                     Remove
                   </button>
                   <button
-                    className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                    className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-white/20"
                     type="submit"
                     >
                     Save

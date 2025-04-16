@@ -16,6 +16,11 @@ const seriesSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  cover_image2: {
+    type: String,
+    required: true,
+    trim: true
+  },
   desc: {
     type: String,
     required: true,
@@ -29,7 +34,7 @@ const seriesSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Rating'
   }],
-  trating: {
+  trating: { 
     type: Number,
     required: true
   },
@@ -55,6 +60,14 @@ const seriesSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  expiryTime:{
+    type:Number,
+    required:true
+  },
+  uploadedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Users"
   }
 });
 

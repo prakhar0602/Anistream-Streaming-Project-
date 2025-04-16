@@ -1,14 +1,15 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import { check_user } from '../../Redux/userSlice';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
+import axios from 'axios';
+const {VITE_BACKEND_LINK} = import.meta.env
 const ProtectedRoutes = ({children}) => {
     let [redirect,setRedirect]=useState(true)
     useEffect(()=>{
         async function ab(){
-            let a=localStorage.getItem('Expiry') || 0
-            if(a<Date.now()){
-                toast.error('Login First');
+            let response=await axios.get(`${VITE_BACKEND_LINK}/verify_token`,{withCredentials:true})
+            response=response.data.bool
+            if(!response){
            await setRedirect(false);}
         }
         ab()

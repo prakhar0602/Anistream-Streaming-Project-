@@ -71,7 +71,7 @@ const Episode = () => {
        <div className="flex flex-col items-start">
         {
           iframeCode ? (
-            <div className="bg-[#6718c2] text-white text-bold w-[calc(100vw-40px)] max-w-[888px] lg:w-full">
+            <div className="bg-white/20 text-white text-bold w-[calc(100vw-40px)] max-w-[888px] lg:w-full">
               <div className='xl:w-[888px] lg:h-[500px] w-full h-[calc(100vw*0.5125)] ' dangerouslySetInnerHTML={{ __html: iframeCode }} />
                 <div className="flex flex-col lg:p-5 p-2 gap-3">
                   <p className="m-0 lg:text-3xl text-xl font-bold ">{title}</p>
@@ -115,11 +115,11 @@ const Episode = () => {
             <div></div>
             )
           }
-         <div className="flex flex-col mx-auto my-14 p-5 bg-[#6718c2] w-[calc(100vw-40px)] lg:w-full">
+         <div className="flex flex-col mx-auto my-14 p-5 bg-white/20 w-[calc(100vw-40px)] lg:w-full">
           <h3 className="text-white text-xl font-medium mb-4">
             Comments
             </h3>
-          <div className="flex gap-1 mb-1 p-2 bg-[#9c4bffad] shadow-[0_1px_3px_rgba(0, 0, 0, 0.1)]">
+          <div className="flex gap-1 mb-1 p-2  shadow-[0_1px_3px_rgba(0, 0, 0, 0.1)]">
             <form className='flex items-center gap-1 w-full' onSubmit={handleSubmit}>
               <div className="hidden">
                 <input type="hidden" name='name' id='name' value={JSON.parse(localStorage.getItem('User')).username} />

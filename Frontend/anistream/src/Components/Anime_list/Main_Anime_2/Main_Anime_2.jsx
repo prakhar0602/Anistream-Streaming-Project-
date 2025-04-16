@@ -132,7 +132,7 @@ const Main_Anime_2 = (props) => {
               Rated: {rate} stars
             </p>
             <button
-              className="bg-purple-800 p-2 rounded-lg hover:bg-purple-950 h-14"
+              className="p-2 rounded-lg bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000] "
               onClick={(e) => clearRating(e)}
             >
               Clear Rating
@@ -176,7 +176,7 @@ const Main_Anime_2 = (props) => {
                 </label>
               </fieldset>
 
-              <button className="bg-purple-800 lg:p-2 p-1 rounded-lg hover:bg-purple-950 lg:h-14 h-10">
+              <button className="bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000] p-2 rounded-lg">
                 Submit Rating
               </button>
             </form>
@@ -186,30 +186,27 @@ const Main_Anime_2 = (props) => {
         </div>
         <div className="flex justify-left mt-3 lg:mt-0">
           <Link
-            className="hover:bg-gradient-to-r text-white from-[#be51ca] to-[#753eb9] inline mr-2 lg:ml-3 h-fit w-fit lg:py-2.5 py-2 lg:px-6 px-3 lg:text-lg text-sm rounded-3xl bg-gradient-to-r hover:from-[#a448ae] hover:to-[#5c3290]"
+            className=" text-white h-12 flex justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000]"
             onClick={(e) => select_Episode(e)}
           >
             Watch Episode 1
           </Link>
           {wishList ? (
             <Link
-              className="hover:bg-gradient-to-r text-white lg:h-fit from-[#be51ca] to-[#753eb9] mr-2 ml-3 lg:py-2.5 py-1 h-[36px] flex   lg:px-6 px-5 rounded-3xl bg-gradient-to-r hover:from-[#a448ae] hover:to-[#5c3290] items-center gap-2"
+            className=" text-white flex h-12 justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000]"
               onClick={() => toggleWishlist()}
             >
               <span className={"lg:text-2xl h-fit text-xl m-0 flex items-center text-red-400"}>
                 <ion-icon className='h-fit' name="bookmark"></ion-icon>
               </span>
-              <span className="hidden text-lg lg:inline">
+              <span className="text-lg inline">
 
               Remove from WatchList
-              </span>
-              <span className='flex lg:hidden m-0 items-center h-fit'>
-                WatchList
               </span>
             </Link>
           ) : (
             <Link
-              className="hover:bg-gradient-to-r lg:h-fit text-white h-[36px] items-center from-[#be51ca] to-[#753eb9] mr-2 ml-3 lg:py-2.5 py-2 lg:px-6 px-5 rounded-3xl bg-gradient-to-r hover:from-[#a448ae] hover:to-[#5c3290] flex gap-2"
+            className=" text-white flex justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000]"
               onClick={() => toggleWishlist()}
             >
               <span className={"lg:text-2xl text-xl m-0 h-fit flex items-center text-white"}>

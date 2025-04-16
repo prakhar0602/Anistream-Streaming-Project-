@@ -1,79 +1,60 @@
-import axios from 'axios';
-import React, { useState } from 'react'
+import axios from "axios";
+import React, { useState } from "react";
+import { toast } from "react-toastify"; // Ensure react-toastify is installed
 
-const FolderCreation = (props) => {
+const FolderCreation = ({ user }) => {
+  
+  const [name,setName] = useState("");
+  function handleName(event) {
+    setName(event.target.value);
+  }
 
-    let name=props.name;
-    let setName=props.setName;
-    let setFld_id=props.setFld_id;
-    let setLoading = props.setLoading;
-    let user=props.user;
-    let setas=props.setas;
+  async function folder_creation(e) {
+    e.preventDefault();
 
-    function handleName(event) {
-        setName(event.target.value);
-        localStorage.setItem('upload_name',event.target.value);
-    }
-    async function folder_creation(e) {
-        e.preventDefault();
-        if(user.type!='admin'){
-          toast.warning('Request Rejected',{
-            position:'top-center'
-          })
-          return
-        }
-        setLoading(true)
-        //create folder on server
-        let fis, server;
-        try {
-          fis = await axios.get(
-            `https://api.streamwish.com/api/folder/create?key=11124m28yb5z5qbkuh1ru&name=${name}`
-          );
-          console.log(fis)
-          fis = fis.data.result.fld_id;
-          setFld_id(fis);
-          localStorage.setItem("fld_id", fis);
-        } catch (error) {
-          console.log(error);
-        }
+    if (user.type !== "admin") {
+      toast.warning("Request Rejected", { position: "top-center" });
     
-        //create server upload link
-        try {
-          server = await axios.get(
-            "https://api.streamwish.com/api/upload/server?key=11124m28yb5z5qbkuh1ru"
-          );
-          server = server.data.result;
-          setas(server);
-          console.log(server);
-        } catch (error) {
-          console.log(error);
-        }
-        setLoading(false)
-      }
+      return;
+    }
+    console.log("Folder Created");
 
+    try {
+      // Create folder on server
+      const fisResponse = await axios.get(
+        `https://api.streamwish.com/api/folder/create?key=11124m28yb5z5qbkuh1ru&name=${name}`
+      );
+    } catch (error) {
+      console.error("Error in folder creation:", error);
+    }
+  }
 
   return (
-        <div className="flex gap-[60px]">
-        <form className="flex flex-col gap-[20px]" onSubmit={folder_creation}>
-          <div className="flex justify-between items-center">
-            <label className="text-white font-mono text-[18px]" htmlFor="name">
-              Folder Name
+    <div className="flex  w-fit gap-96 items-center bg-black/40 p-10 rounded-xl">
+        <form className="flex flex-col gap-5 " onSubmit={folder_creation}>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <label className="font-mono text-lg text-white" htmlFor="name">
+              Folder Name:
             </label>
             <input
-              className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
+              className="outline-none p-2 border border-white rounded-lg font-mono text-lg bg-transparent text-white"
               type="text"
               id="name"
               name="name"
               onChange={handleName}
               value={name}
-              />
-            <button className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]">
-              Submit
-            </button>
+              required
+            />
           </div>
-        </form>
-      </div>
-  )
-}
+          <button
+            type="submit"
+            className="rounded-lg py-2 px-5 text-2xl text-white  bg-blue-500 hover:bg-blue-600 transition-all"
+          >
+            Submit
+          </button>
+        </form>     
+    </div>
+  );
+};
 
-export default FolderCreation
+export default FolderCreation;

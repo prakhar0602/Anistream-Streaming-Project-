@@ -1,71 +1,125 @@
-import axios from 'axios';
-import React, { useState } from 'react'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import FolderList from "../../Components/Anime_list/New/FolderList";
 
-const URLUpload = (props) => {
-  const [files,setFiles]=useState([])
-  const [newUrl,setNewUrl]=useState('')
-  const fld_id = props.fld_id;
-  const as = props.as;
+const URLUpload = () => {
+  const [fld_id, setFld_id] = useState("");
+  const [files, setFiles] = useState([]);
+  const [newUrl, setNewUrl] = useState("");
+  const [isUploaded, setUploaded] = useState(false);
+  const [uploadStatus, setStatus] = useState([]);
+  const [uploadError, setError] = useState([]);
 
-  function addUrl(){
-    let t_files=newUrl.split(",");
-    let f_files = [...files,...t_files];
-    let ff_files=f_files
-    if(f_files.length>50)
-      ff_files=f_files.slice(0,50);
-    setFiles(ff_files);
-    setNewUrl('');
-  }
-  function changeURL(index,e){
-    let t_files=[...files];
-    if(e.target.value.length==0)
-      t_files.splice(index,1);
-    else
-      t_files[index]=e.target.value;
-    setFiles(t_files);
-    console.log(files)
-  }
-  function removeURL(index){
-    let t_files=[...files];
-    t_files.splice(index,1);
-    setFiles(t_files);
-  }
-  async function addFiles(){
-    for(let i of files){
-      let response = await axios.get(`https://api.streamwish.com/api/upload/url?key=11124m28yb5z5qbkuh1ru&url=${i}&fld_id=${fld_id}`);
-      console.log(i);
-      console.log(response)
+  useEffect(() => {
+    if (isUploaded) {
+      const interval = setInterval(() => chk_status(), 10 * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isUploaded]);
+
+  async function chk_status() {
+    try {
+      let response = await axios.get(
+        "https://api.streamwish.com/api/file/url_uploads?key=11124m28yb5z5qbkuh1ru"
+      );
+      let result = response.data.result;
+      let errorFiles = result.filter((x) => x.status === "ERROR");
+      let successFiles = result.filter((x) => x.status !== "ERROR");
+
+      setError([...JSON.parse(sessionStorage.getItem("error") || "[]"), ...errorFiles]);
+      sessionStorage.setItem("error", JSON.stringify([...uploadError, ...errorFiles]));
+
+      if (successFiles.length === 0) {
+        sessionStorage.removeItem("error");
+        setStatus([]);
+      } else {
+        setStatus(successFiles);
+      }
+    } catch (error) {
+      console.error("Error checking upload status:", error);
     }
   }
-  return (
-    <div className='flex flex-col justify-center items-center gap-5'>
-      <div className='flex flex-col justify-center items-center gap-3'>
-        <label className="text-white font-mono text-[18px]" htmlFor="url">Enter URLS for the files</label>
-        {
-          files.length<=12?(
-              files.map((url,index)=>(
-                <div className='flex gap-6 justify-center items-center'>
-                  <input className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                    type="text" value={url} id={index} onChange={(e)=>changeURL(index,e) }/>
-                  <button className="rounded-[15px] h-fit w-fit py-[5px] px-[20px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#c23c3c] to-[#840000]" onClick={()=>removeURL(index)}>X</button>
-                </div>
-              ))
-          ):(<span className="text-white font-mono text-[18px]"> Total Files : {files.length}</span>)
-        }
-      </div>
-      {
-        files.length<51?(
-      <div className='flex flex-col justify-center items-center gap-3'>
-        <input className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-             type="text" value={newUrl} onChange={(e)=>setNewUrl(e.target.value)} />
-        <button className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]" onClick={()=>addUrl()}>Add</button>
-      </div>
 
-        ):(<span>No more can be added</span>)
+  async function upload() {
+    try {
+      for (let url of files) {
+        await axios.get(
+          `https://api.streamwish.com/api/upload/url?fld_id=${fld_id}&key=11124m28yb5z5qbkuh1ru&url=${url}`
+        );
       }
-      <button className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0  text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]" onClick={()=>addFiles()}>Add Files</button>
-    </div>
-  )
-}
+      sessionStorage.setItem("error", "[]");
+      setUploaded(true);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+  }
 
-export default URLUpload
+  function addUrl() {
+    let urls = newUrl.split(",").map((url) => url.trim());
+    let newFiles = [...files, ...urls].slice(0, 50);
+    setFiles(newFiles);
+    setNewUrl("");
+  }
+
+  function removeURL(index) {
+    setFiles(files.filter((_, i) => i !== index));
+  }
+
+  return (
+    <div className="flex  w-full items-center gap-6 p-6 bg-gray-900/90 backdrop-blur-lg rounded-xl border border-gray-700 shadow-2xl overflow-auto h-fit">
+      <FolderList setFolder={setFld_id} folder={fld_id} />
+
+      <div className="w-full max-w-3xl flex flex-col items-center gap-5 p-6 bg-gray-800/80 border border-gray-600 rounded-lg shadow-lg overflow-auto max-h-[70vh]">
+        <h2 className="text-2xl font-bold text-blue-400">🔗 Enter File URLs</h2>
+
+        <span className="text-gray-300 font-mono text-lg">Total Files: {files.length}</span>
+
+        {files.length < 50 && (
+          <div className="w-full flex flex-col gap-4">
+            <input
+              type="text"
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              className="w-full p-3 text-lg text-gray-200 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Paste URLs (comma-separated)"
+            />
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={addUrl}
+                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
+              >
+                ➕ Add URL
+              </button>
+              <button
+                onClick={upload}
+                className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+              >
+                🚀 Upload
+              </button>
+            </div>
+          </div>
+        )}
+
+        {files.length >= 50 && (
+          <p className="text-red-400 font-semibold">⚠️ Maximum 50 URLs allowed!</p>
+        )}
+
+        <ul className="w-full mt-4 space-y-2 overflow-auto max-h-40">
+          {files.map((url, index) => (
+            <li key={index} className="flex justify-between items-center p-2 bg-gray-700 rounded-md">
+              <span className="text-gray-300 truncate max-w-[80%]">{url}</span>
+              <button
+                onClick={() => removeURL(index)}
+                className="text-red-500 hover:text-red-400 transition"
+              >
+                ❌
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default URLUpload;

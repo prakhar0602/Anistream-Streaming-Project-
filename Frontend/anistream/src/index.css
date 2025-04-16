@@ -13,3 +13,21 @@
         scrollbar-width: none;  /* Firefox */
   }
 }
+
+
+@font-face{
+    font-family: "funky";
+    src:url("./Assets/fonts/HeyhomigueloRegular-qZvrd.otf");
+}
+@font-face{
+    font-family: "black_clover";
+    src:url("./Assets/fonts/BlackCloverFont.ttf");
+}
+@font-face{
+    font-family: "beastars";
+    src:url("./Assets/fonts/beastars.otf");
+}
+@font-face{
+    font-family: "dragon_ball";
+    src:url("./Assets/fonts/Saiyan-Sans.ttf");
+}

@@ -15,9 +15,10 @@ const userSchema=mongoose.Schema({
         required:true,
         trim:true
     },
-    uid:{
+    password:{
         type:String,
-        required:true
+        required:true,
+        trim:true
     },
     wishlist:{type:mongoose.Schema.Types.ObjectId,ref:'wishlist'}
 })

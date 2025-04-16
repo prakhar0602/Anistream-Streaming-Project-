@@ -1,11 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import logo from '../../../Assets/loading.gif'
+import { useSelector } from "react-redux";
 const {VITE_BACKEND_LINK}=import.meta.env
 const Edit = () => {
   let [series, setSeries] = useState([]);
   let [movies, setMovies] = useState([]);
+  let [list, getList] = useState([]);
   let [isLoading,setLoading]=useState(false)
+  const user = useSelector((state)=>state.user.user);
   async function getSeries() {
     setLoading(true)
     let response = await axios.get(`${VITE_BACKEND_LINK}/get_series`);
@@ -42,6 +45,7 @@ const Edit = () => {
     fd.append("nseasons", e.target.nseasons.value);
     fd.append("nepisodes", e.target.nepisodes.value);
     fd.append("type", e.target.type.value);
+    fd.append("userID", user._id);
     let encoded = new URLSearchParams(fd).toString();
     try {
       let response = await axios.post(
@@ -69,15 +73,21 @@ const Edit = () => {
       <div className="flex">
         <button
           onClick={() => getSeries()}
-          className="hover:bg-gradient-to-r text-white hover:from-[#be51ca] hover:to-[#753eb9] inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-gradient-to-r from-[#be51caac] to-[#763eb9a7]"
+          className="hover:bg-gradient-to-r text-white inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
           >
           Edit Series
         </button>
         <button
           onClick={() => getMovies()}
-          className="hover:bg-gradient-to-r text-white hover:from-[#be51ca] hover:to-[#753eb9] inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-gradient-to-r from-[#be51caac] to-[#763eb9a7]"
+          className="hover:bg-gradient-to-r text-white  inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
           >
           Edit Movies
+        </button>
+        <button
+          onClick={() => getUpdateList()}
+          className="hover:bg-gradient-to-r text-white  inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
+        >
+          Get Update List
         </button>
       </div>
       <div>
@@ -267,14 +277,14 @@ const Edit = () => {
                   </div>
                   <div className="btns">
                     <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
                       type="button"
                       onClick={() => rem(folder.type, folder._id)}
                       >
                       Remove
                     </button>
                     <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
                       type="submit"
                       >
                       Save
@@ -471,14 +481,14 @@ const Edit = () => {
                   </div>
                   <div className="btns">
                     <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
                       type="button"
                       onClick={() => rem(folder.type, folder._id)}
                       >
                       Remove
                     </button>
                     <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-gradient-to-r from-[#ca3bda] to-[#733aba]"
+                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
                       type="submit"
                       >
                       Save
@@ -489,6 +499,11 @@ const Edit = () => {
             ))}
           </div>
         )}
+        {
+          list.length==0 ? (<span></span>):(<div className="flex flex-col gap-14 items-center mt-14">
+              
+          </div>)
+        }
       </div>
     </div>)}
         </div>

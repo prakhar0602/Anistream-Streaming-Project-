@@ -22,7 +22,7 @@ router.post('/delete_review',async(req,res)=>{
     await Reviews.findByIdAndDelete(did);
     x.reviews=x.reviews.filter((e)=>e.toString()!=did)
     await x.save()
-    res.status(200).json({'msg':'deleted'})
+    res.status(200).json({'msg':'deleted'}) 
 })
 
 module.exports=router;

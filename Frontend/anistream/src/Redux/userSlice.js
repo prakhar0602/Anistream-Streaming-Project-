@@ -3,7 +3,12 @@ import axios from "axios";
 const {VITE_BACKEND_LINK}=import.meta.env
 
 export function get_user(){
-    return JSON.parse(localStorage.getItem('User'))
+    try{
+        return JSON.parse(localStorage.getItem('User'))
+    }
+    catch(e){
+        return undefined;
+    }
 }
 
 let initialState={user:get_user()}
@@ -14,17 +19,14 @@ function login1(state,action){
     state.user=action.payload;
     localStorage.setItem('User',JSON.stringify(action.payload));
 }
-    catch(e){
-        console.log(e)
-    }
+catch(e){
+    console.log(e)
 }
-export const logout=createAsyncThunk('logout',async()=>{
-    let response = await axios.get(`${VITE_BACKEND_LINK}/logout`,{
-        withCredentials:true
-      })
-    return 0;
-})
-
+}
+function logout1(state,action){
+    state.user=undefined
+    localStorage.removeItem('User');
+}
 export async function check_user(){
     axios.defaults.withCredentials = true;
     let response=await axios.get(`${VITE_BACKEND_LINK}/login_status`,{
@@ -35,15 +37,9 @@ export const userSlice=createSlice({
     name:'User',
     initialState,
     reducers:{
-        login:(state,action)=>login1(state,action)
-    },
-    extraReducers:(builder)=>{
-        builder.addCase(logout.fulfilled,(state,action)=>{
-            state.user=null
-            localStorage.setItem('User','null')
-            localStorage.setItem('expiry','0')
-        })
+        login:(state,action)=>login1(state,action),
+        logout:(state,action)=>logout1(state,action)
     }
 })
-export const {login} = userSlice.actions;
+export const {login,logout} = userSlice.actions;
 export default userSlice.reducer

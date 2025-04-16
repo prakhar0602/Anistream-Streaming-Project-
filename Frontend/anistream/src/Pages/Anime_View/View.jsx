@@ -18,6 +18,7 @@ const View = () => {
     let navigate=useNavigate()
     useEffect(()=>{
       async function ab(){
+        
         setFiles(data.episodes)
         let n=data.nseasons.split(' ')
         setSeasons(n)
@@ -74,26 +75,7 @@ const View = () => {
             ):(
     <div className='w-full pb-14'>
         <Main_Anime_2 x={data}/>
-        <div className='lg:p-8 p-4 flex flex-col'>
-        <button className={`w-48 bg-purple-400 py-2 hover:bg-purple-500 ${open ? 'rounded-t-lg' : 'rounded-lg'}`} onClick={()=>changeopen()}><p className='text-lg font-medium'>Seasons</p></button>
-        {
-          open?
-          (
-            <ul>
-            {seasons.map((a,index)=>(
-              Number(a)<=0?
-                (<li><button className='w-48 bg-purple-400 py-2 px-14  hover:bg-purple-500' onClick={()=>changeSeason(index+1)}><p className='text-lg font-medium'>Season OVA</p></button></li>):
-              (<li><button className='w-48 bg-purple-400 py-2 px-14  hover:bg-purple-500' onClick={()=>changeSeason(index+1)}><p className='text-lg font-medium'>Season {index+1}</p></button></li>
-              )
-              )
-              
-              )
-            }
-            </ul>
-          ):(<span></span>)
-        }
-        </div>
-        <div className=' overflow-hidden w-full flex justify-center items-center'>
+        <div className=' overflow-hidden w-full flex justify-center items-center pt-14'>
         <div className="lg:w-[95%] ml-[23px] w-full grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 gap-y-10">
           {
             selectedfiles.map((f,index)=>(

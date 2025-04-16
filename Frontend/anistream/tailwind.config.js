@@ -6,6 +6,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        funky:["funky","sans-serif"],
+        black_clover:["black_clover","sans-serif"],
+        beastars:["beastars","sans-serif"],
+        dragon_ball:["dragon_ball","sans-serif"],
+      }
     },
   },
   plugins: [],
