@@ -19,6 +19,7 @@ const EmailInput = (props) => {
       let response = await axios.post(`${VITE_BACKEND_LINK}/sendOTP`, {
         email,
       });
+      console.log(response)
       if (response.data.bool) {
         setContinue1(false);
         setContinue2(true);

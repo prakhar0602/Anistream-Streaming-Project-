@@ -59,13 +59,13 @@ const handleLogin = async (req, res) => {
                     res.cookie('accessToken',token,{
                         httpOnly:true,
                         secure:true,
-                        sameSite:'Strict',
+                        sameSite:'None',
                         maxAge:1000*60*5
                     })
                     res.cookie('refreshToken',refreshToken,{
                         httpOnly:true,
                         secure:true,
-                        sameSite:'Strict',
+                        sameSite:'None',
                         maxAge:1000*60*60*2
                     })
                     res.status(200).json({users,bool:true,msg:"Login Successfull"});
