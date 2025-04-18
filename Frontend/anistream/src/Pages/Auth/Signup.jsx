@@ -4,7 +4,7 @@ import OtpInput from "../../Components/Signup_Components/OtpInput";
 import EmailInput from "../../Components/Signup_Components/EmailInput";
 import DP from "../../Components/DP";
 import pic from "../../Assets/Signup_DP.jpg";
-
+import background from "../../Assets/Signup_Background.jpg"
 const Signup = () => {
   let [email, setEmail] = useState("");
   const [continue1, setContinue1] = useState(true);
@@ -12,7 +12,10 @@ const Signup = () => {
   const [continue3, setContinue3] = useState(false);
 
   return (
-    <div className="h-screen w-screen bg-[url('src/Assets/Signup_Background.jpg')] bg-cover">
+    <div className="h-screen w-screen bg-cover"
+    style={{
+      background: `url(${background})`
+    }}>
       <div className="h-screen w-screen backdrop-blur-sm flex justify-center items-center">
         <div className="flex flex-col w-[30vw]">
           <DP dp={pic} />

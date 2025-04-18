@@ -3,12 +3,16 @@ import dp from "../../Assets/Login_DP.png";
 import Form from "../../Components/Login_Components/Form";
 import Message from "../../Components/Message";
 import DP from "../../Components/DP";
+import background from "../../Assets/Login_Background.jpg"
 
 const Login = () => {
   const [message, setMessage] = useState("");
 
   return (
-    <div className="h-screen w-screen bg-[url('src/Assets/Login_Background.jpg')] bg-cover">
+    <div className="h-screen w-screen bg-cover"
+      style={{
+        background:`url(${background})`
+      }}>
       <div className="h-screen w-screen backdrop-blur-sm flex justify-center items-center z-40">
         <div className="flex flex-col w-[30vw]">
           <DP dp={dp} />
