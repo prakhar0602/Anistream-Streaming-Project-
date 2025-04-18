@@ -20,7 +20,7 @@ const Episodes = require('./models/Episode');
 const { default: axios } = require('axios');
 const PORT=process.env.PORT || 8080
 app.use(cors({ 
-    origin:['https://anistream-streaming-project-vaie.vercel.app','http://localhost:5173'],
+    origin:['https://anistream-streaming-project-vaie.vercel.app',"https://anistream-streaming-project.vercel.app",'http://localhost:5173'],
    credentials:true,
     methods:["GET","POST","PATCH","DELETE"],
     headers: ["Content-Type", "Authorization", "Origin", "Accept"]

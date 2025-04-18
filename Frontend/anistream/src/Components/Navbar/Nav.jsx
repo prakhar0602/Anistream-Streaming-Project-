@@ -182,7 +182,7 @@ const Nav = () => {
             </button>
           </li>
           {
-            user.type==="admin"?(
+            user && user.type==="admin"?(
             <li>
             <button onClick={()=>changeURL("/upload")} >
               <div className="flex gap-5 hover:text-white">
