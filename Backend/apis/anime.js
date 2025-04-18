@@ -11,6 +11,7 @@ const {
   handleFetchFileInfo,
   handleSearchQuery,
   handleExpiryNotification,
+  handleFetchFoldersById,
 } = require("../controllers/anime");
 
 router.get("/get_series", handleFetchSeries);
@@ -28,6 +29,8 @@ router.get("/get_file_code/:id", handleFetchFileCode);
 router.post("/get_info", handleFetchFileInfo);
 
 router.get("/search/:query", handleSearchQuery);
+
+router.get("/getSyncedfolders/:id",handleFetchFoldersById)
 
 router.get(
   "/setExpiryNotification/:id/:type",

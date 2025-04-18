@@ -17,15 +17,23 @@ const FolderCreation = ({ user }) => {
     
       return;
     }
+
     console.log("Folder Created");
 
     try {
       // Create folder on server
       const fisResponse = await axios.get(
-        `https://api.streamwish.com/api/folder/create?key=11124m28yb5z5qbkuh1ru&name=${name}`
+        `https://api.streamwish.com/api/folder/create?key=11124m28yb5z5qbkuh1ru&name=${name+"_"+user._id}`
       );
+      console.log(fisResponse)
+      if(fisResponse.data.msg!="OK")
+        throw Error("Error");
+      toast.success("Folder Created");
+      
+    console.log("Folder Created");
     } catch (error) {
       console.error("Error in folder creation:", error);
+      toast.error("Folder Creation Failed");
     }
   }
 

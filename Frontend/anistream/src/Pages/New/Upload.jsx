@@ -25,7 +25,7 @@ const Upload = () => {
       style={{ backgroundImage: `url(${bimage})` }}
     >
       {type == "files" ? (
-        <div className="flex h-full justify-start items-center gap-10 p-14">
+        <div className="flex h-full justify-start items-center gap-10 px-14">
           <div className="flex flex-col gap-10 w-[35%]">
             <button
               onClick={() => {setfolderShow(!folderShow);setShowForm1(false);setForm(false)}}
@@ -49,16 +49,14 @@ const Upload = () => {
               {showForm ? "Hide Form" : "Show Form"}
             </button>
           </div>
-          <div className="flex w-full justify-center items-center">
+          <div className={`flex w-full justify-center ${showForm?"items-start":"items-center"} h-[90vh] overflow-scroll no-scrollbar`}>
             {showForm1 ? <FileUpload /> : <span></span>}
             {folderShow ? <FolderCreation user={user} /> : <span></span>}
             {showForm ? <Form /> : <span></span>}
           </div>
-
-          <div className={`flex ${showForm ? "gap-96" : "gap-0"} w-fit`}></div>
         </div>
       ) : type == "url" ? (
-        <div className="flex w-full h-full">
+        <div className="flex w-full h-full items-center">
           <div className=" w-[30%] h-full justify-center items-center flex flex-col gap-10">
 
           <button
@@ -75,7 +73,7 @@ const Upload = () => {
           </button>
           
             </div>
-          <div className="flex h-full justify-center items-center">
+          <div className={`flex h-full justify-center ${showForm?"items-start h-[90vh] overflow-scroll w-[90%] no-scrollbar":"items-center"}`}>
           {showURL ? <URLUpload /> : <span></span>}
           {showForm ? <Form /> : <span></span>}
           </div>

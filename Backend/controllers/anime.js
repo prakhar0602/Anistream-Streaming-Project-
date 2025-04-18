@@ -10,6 +10,7 @@ const {
   fetchFileCode,
   findAnime,
 } = require("../functions/anime_operations");
+const { default: axios } = require("axios");
 
 const handleFetchSeries = async (req, res) => {
   let x = await getSeries();
@@ -91,6 +92,18 @@ const handleFetchFileCode = async (req, res) => {
   }
 };
 
+const handleFetchFoldersById = async(req,res)=>{
+  let {id} = req.params;
+  let response = await axios.get("https://api.streamwish.com/api/folder/list?key=11124m28yb5z5qbkuh1ru&files=1");
+  response = response.data.result.folders;
+  let selectedFolders = response.filter(x=>(x.name.split("_"))[1]==id);
+  // console.log(selectedFolders)
+  selectedFolders.forEach(x=>{
+    x.name = (x.name.split("_"))[0];
+  })
+  res.status(200).json({folders:selectedFolders,msg:"Folders found"});
+}
+
 const handleFetchFileInfo = async (req, res) => {
   const { eps } = req.body;
   let info = [];
@@ -133,4 +146,5 @@ module.exports = {
   handleFetchFileInfo,
   handleSearchQuery,
   handleExpiryNotification,
+  handleFetchFoldersById
 };

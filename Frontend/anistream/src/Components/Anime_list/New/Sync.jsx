@@ -14,20 +14,24 @@ const Sync = () => {
         }
         try {
             let response = await axios.get(
-                "https://api.streamwish.com/api/folder/list?key=11124m28yb5z5qbkuh1ru&files=1"
+                `${VITE_BACKEND_LINK}/getSyncedfolders/${user._id}`
             );
-            response = response.data.result.folders;
+            console.log(response)
+            response = response.data.folders;
             console.log(response)
             let animes=[],f=[];
             let z=1;
             for(let i of response){
                 animes.push(i);
+                console.log(animes);
                 if(z%2==0){
                     f.push([...animes]);
                     animes=[];
                 }
                 z++;
             }
+            if(z%2==0)
+                f.push([...animes])
             console.log(f)
             setFolders(f);
         } catch (error) {
@@ -93,7 +97,7 @@ const Sync = () => {
     return (
     <div>
     {folders.length !== 0 ? (
-        <div className="mt-[20px] flex flex-col items-center gap-7">
+        <div className=" h-screen flex flex-col items-center gap-7 overflow-y-scroll">
           <h2 className="text-3xl m-[10px] red font-semibold">Synced items</h2>
           {folders.map((anime, i) => (
             <div className='flex gap-28 mb-14'>
@@ -101,8 +105,8 @@ const Sync = () => {
             folder==undefined?(
                 <h2 className="text-3xl m-[10px] red font-semibold">Removed</h2>
             ):(
-            <div className="flex flex-col " key={folder.fld_id}>
-              <h2 className="a1">Anime {index +i*2+ 1}</h2>
+            <div className="flex flex-col bg-black/50 p-7 rounded-xl" key={folder.fld_id}>
+              <h2 className="a1 text-lg">Anime {index +i*2+ 1}</h2>
               <form
                 className="flex flex-col gap-4 w-50 justify-center items-center"
                 onSubmit={handleSubmitedit}

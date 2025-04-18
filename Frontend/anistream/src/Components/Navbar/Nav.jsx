@@ -181,7 +181,9 @@ const Nav = () => {
               </div>
             </button>
           </li>
-          <li>
+          {
+            user.type==="admin"?(
+            <li>
             <button onClick={()=>changeURL("/upload")} >
               <div className="flex gap-5 hover:text-white">
               <p className="  w-[100px] text-center">
@@ -190,7 +192,8 @@ const Nav = () => {
                 <p className={`  ${menuOpen?("ml-0 opacity-100"):("-ml-14 opacity-0")}  transition-margin transition-opacity duration-500 ease-in-out`}>Add</p>
               </div>
             </button>
-          </li>
+          </li>):(<></>)
+          }
         </ul>
       </div>
       <div className="text-2xl flex text-[#8f8f8f]">

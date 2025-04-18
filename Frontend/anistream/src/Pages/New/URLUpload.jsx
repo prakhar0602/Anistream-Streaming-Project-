@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FolderList from "../../Components/Anime_list/New/FolderList";
+import { toast } from "react-toastify";
 
 const URLUpload = () => {
   const [fld_id, setFld_id] = useState("");
@@ -12,28 +13,30 @@ const URLUpload = () => {
 
   useEffect(() => {
     if (isUploaded) {
-      const interval = setInterval(() => chk_status(), 10 * 1000);
+      const interval = setInterval(() => chk_status(interval), 10 * 1000);
       return () => clearInterval(interval);
     }
   }, [isUploaded]);
 
-  async function chk_status() {
+  async function chk_status(inte) {
     try {
       let response = await axios.get(
         "https://api.streamwish.com/api/file/url_uploads?key=11124m28yb5z5qbkuh1ru"
       );
       let result = response.data.result;
       let errorFiles = result.filter((x) => x.status === "ERROR");
-      let successFiles = result.filter((x) => x.status !== "ERROR");
-
+      let workingFiles = result.filter((x) => x.status === "WORKNG");
+      toast.success(`${workingFiles.length} files Uploading`)
+      toast.error(`${errorFiles.length} files not uploaded`)
       setError([...JSON.parse(sessionStorage.getItem("error") || "[]"), ...errorFiles]);
       sessionStorage.setItem("error", JSON.stringify([...uploadError, ...errorFiles]));
 
-      if (successFiles.length === 0) {
+      if (workingFiles.length === 0) {
         sessionStorage.removeItem("error");
         setStatus([]);
+        clearInterval(inte);
       } else {
-        setStatus(successFiles);
+        setStatus(workingFiles);
       }
     } catch (error) {
       console.error("Error checking upload status:", error);

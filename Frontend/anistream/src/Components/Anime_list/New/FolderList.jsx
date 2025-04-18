@@ -1,16 +1,17 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-
+import { useSelector } from "react-redux";
+const {VITE_BACKEND_LINK} = import.meta.env;
 const FolderList = ({ folder, setFolder }) => {
   const [folders, setFolders] = useState([]);
-
+  const user = useSelector((state)=>state.user.user)
   useEffect(() => {
     async function fetchFolders() {
       try {
         let response = await axios.get(
-          "https://api.streamwish.com/api/folder/list?key=11124m28yb5z5qbkuh1ru"
-        );
-        setFolders(response.data.result.folders);
+          `${VITE_BACKEND_LINK}/getSyncedfolders/${user._id}`
+      );
+        setFolders(response.data.folders);
       } catch (error) {
         console.error("Error fetching folders:", error);
       }
@@ -19,7 +20,7 @@ const FolderList = ({ folder, setFolder }) => {
   }, []);
 
   return (
-    <div className="p-6 bg-gray-900/90 backdrop-blur-lg border border-gray-700 text-gray-200 rounded-2xl w-full max-w-md mx-auto shadow-xl">
+    <div className="p-6 bg-gray-900/90 h-fit max-h-[70vh] backdrop-blur-lg border overflow-scroll no-scrollbar border-gray-700 text-gray-200 rounded-2xl w-full max-w-md mx-auto shadow-xl">
       {/* Title */}
       <h2 className="text-3xl font-bold text-center text-blue-400 mb-4 drop-shadow-lg tracking-widest">📁 Folder List</h2>
 

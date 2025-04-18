@@ -17,7 +17,7 @@ const FileUpload = () => {
     createUploadLink();
   }, []);
   return (
-    <div className="flex  items-center gap-10">
+    <div className="flex items-center gap-10">
       <FolderList folder={selectedFolder} setFolder={setSelectedFolder} />
       <form
         className="flex flex-col gap-5 items-center p-5 border border-gray-400 rounded-lg bg-gray-800"

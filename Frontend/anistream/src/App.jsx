@@ -19,11 +19,17 @@ import Resgister_Series from './Pages/New/Upload'
 import { useState } from 'react'
 import New from './Pages/New/New'
 import Upload from './Pages/New/Upload'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify'
 function App() {
   return (
     <div className='bg-[#0F1014] min-h-screen h-full w-full font-funky tracking-widest ' >
       
       <Provider store={store}>
+        <ToastContainer 
+          position="top-center"
+          autoClose={3000}
+        />
       <Nav />
       <div className='ml-[100px]'>
 
