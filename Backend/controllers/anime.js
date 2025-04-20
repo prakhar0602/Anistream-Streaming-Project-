@@ -79,7 +79,7 @@ const handleAddAnime = async (req, res) => {
     nseasons,
     nepisodes,userID
   );
-  res.status(201).json({ data: "Data added" });
+  res.status(201).json({ bool:true,data: "Data added" });
 };
 
 const handleFetchFileCode = async (req, res) => {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import FolderList from "./FolderList";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Form = () => {
   const { VITE_BACKEND_LINK } = import.meta.env;
@@ -37,10 +38,19 @@ const Form = () => {
     formData.append("userID",user._id);
 
     try {
-      await axios.post(`${VITE_BACKEND_LINK}/add_anime`, new URLSearchParams(formData).toString(), {
+      let response = await axios.post(`${VITE_BACKEND_LINK}/add_anime`, new URLSearchParams(formData).toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
+      // console.log(response)
+      response=response.data.data
+      
+      if(response=="Data added"){
+        toast.success("Anime added");
+      }
+      else
+        toast.error("Anime not added");
     } catch (error) {
+      toast.error("Anime not added");
       console.log(error);
     }
   }
