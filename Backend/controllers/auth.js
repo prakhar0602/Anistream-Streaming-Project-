@@ -36,7 +36,10 @@ const handleVerifyToken = async(req,res)=>{
     try{
         let {refreshToken} = req.cookies
         let {type} = jwt.verify(refreshToken,"Prakhar_Gupta")
-        res.json({bool:true,type})
+        if(type)
+            res.json({bool:true,type})
+        else
+            res.json({bool:false})
     }
     catch(e){
         res.json({bool:false})}
@@ -138,7 +141,6 @@ const handleLogout = async(req,res)=>{
         await OnlineUsers.deleteOne({email}); 
         res.status(200).json({bool:true,msg:'logout'})}
         catch(e){
-
             res.status(200).json({bool:false,msg:'logout failed'})
         }
 }

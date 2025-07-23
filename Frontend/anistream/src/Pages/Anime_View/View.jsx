@@ -76,7 +76,7 @@ const View = () => {
     <div className='w-full pb-14'>
         <Main_Anime_2 x={data}/>
         <div className=' overflow-hidden w-full flex justify-center items-center pt-14'>
-        <div className="lg:w-[95%] ml-[23px] w-full grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 gap-y-10">
+        <div className="lg:w-[95%] ml-[23px] w-full grid lg:grid-cols-3 grid-cols-2 gap-y-10">
           {
             selectedfiles.map((f,index)=>(
               <Link onClick={(e)=>select_Episode(e,index)}>

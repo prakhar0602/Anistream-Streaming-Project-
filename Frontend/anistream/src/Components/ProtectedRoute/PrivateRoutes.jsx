@@ -11,6 +11,7 @@ const PrivateRoutes = ({children}) => {
         const response = await axios.get(`${VITE_BACKEND_LINK}/verify_token`,{
           withCredentials:true
         })
+        console.log(response.data.bool)
         if(response.data.bool)
           setRedirect(true);
       }
