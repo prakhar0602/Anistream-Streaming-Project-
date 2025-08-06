@@ -39,7 +39,7 @@ function set_episode(state,action){
         a.push(state.files[i]);
     }
     state.nxtFiles=a;
-    state.iframeCode=`<IFRAME SRC="https://hglink.to/e/${state.files[state.index].file_code}" FRAMEBORDER=0 MARGINWIDTH=0 MARGINHEIGHT=0 SCROLLING=NO WIDTH=1155 HEIGHT=650 allowfullscreen></IFRAME>`
+    state.iframeCode=`<IFRAME SRC="https://hglink.to/e/${state.files[state.index].file_code}" FRAMEBORDER=0 MARGINWIDTH=0 MARGINHEIGHT=0 SCROLLING=NO WIDTH="100%" HEIGHT="100%" allowfullscreen></IFRAME>`
     localStorage.setItem('episode_data',JSON.stringify(state))
 }
 
