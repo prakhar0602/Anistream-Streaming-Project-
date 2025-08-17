@@ -1,5 +1,12 @@
-from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 from services.data_service import DataService
+
+def cosine_similarity(a, b):
+    """Calculate cosine similarity between vectors"""
+    dot_product = np.dot(a, b.T)
+    norm_a = np.linalg.norm(a, axis=1, keepdims=True)
+    norm_b = np.linalg.norm(b, axis=1, keepdims=True)
+    return dot_product / (norm_a * norm_b.T)
 
 class RecommendationService:
     def __init__(self):
@@ -28,7 +35,8 @@ class RecommendationService:
             return []
         
         user_embedding = watched_anime_embeddings.mean(axis=0).values.reshape(1, -1)
-        cosine_sim = cosine_similarity(user_embedding, combined_anime_embeddings_df.drop(columns=['anime_id']))
+        embeddings_matrix = combined_anime_embeddings_df.drop(columns=['anime_id']).values
+        cosine_sim = cosine_similarity(user_embedding, embeddings_matrix)
         sim_scores = list(enumerate(cosine_sim[0]))
         
         watched_anime_combined_indices = combined_anime_df[

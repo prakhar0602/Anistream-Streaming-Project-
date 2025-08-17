@@ -43,35 +43,35 @@ const Home = () => {
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Recommended for You</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-            {/* {
+            {
               recommendations.map((s,index)=>(
                 <Link key={s._id} to="/view" onClick={()=>dispatch(select(s))}>
                   <Template series={s}/>
                 </Link>
                 ))
-              } */}
+              }
           </div>
         </div>
         )}
         
-        {(series || []).length > 0 && (
+        {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
             {
-              (series || []).map((s,index)=>(
+              series.map((s,index)=>(
                <Template series={s} key={s.fld_id}/>
                 ))
               }
           </div>
         </div>
         )}
-        {(series || []).length > 0 && (
+        {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
             {
-              [...(series || [])].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
+              [...series].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
                 <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
                 ))
               }
@@ -101,24 +101,24 @@ const Home = () => {
       </div>
 
 
-        {(series || []).length > 0 && (
+        {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Series</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
             {
-              (series || []).map((s,index)=>(
+              series.map((s,index)=>(
                 <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
                 ))
               }
           </div>
         </div>
         )}
-        {(movies || []).length > 0 && (
+        {movies && movies.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5"> 
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Movies</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
             {
-              (movies || []).map((s,index)=>(
+              movies.map((s,index)=>(
                 <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
                 ))
               }
