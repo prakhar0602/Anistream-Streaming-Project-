@@ -1,8 +1,10 @@
 import React from "react";
 
-const Genre = ({ title, image }) => {
+const Genre = ({ title, image, onClick }) => {
   return (
-    <div className="relative group w-40 hover:scale-110 tranision duration-500 h-24 ml-3 my-3 lg:w-72 lg:h-52 bg-gray-800 rounded-lg overflow-hidden cursor-pointer">
+    <div 
+      onClick={() => onClick(title)}
+      className="relative group w-40 hover:scale-110 tranision duration-500 h-24 ml-3 my-3 lg:w-72 lg:h-52 bg-gray-800 rounded-lg overflow-hidden cursor-pointer">
       {/* Background Image */}
       <img
         src={image}

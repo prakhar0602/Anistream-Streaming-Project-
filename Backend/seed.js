@@ -3,8 +3,30 @@ const user = require('./models/Users')
 const wishlist = require('./models/WishList')
 const Series = require('./models/Series')
 const Episodes = require('./models/Episode')
+const Viewed = require('./models/Viewed')
 const { default: axios } = require('axios')
 const Movies = require('./models/Movies')
+async function seedViewed(){
+    const allSeries = await Series.find();
+    const allMovies = await Movies.find();
+    
+    for(let series of allSeries){
+        const exists = await Viewed.findOne({animeId: series._id, animeModel: 'Series'});
+        if(!exists){
+            await Viewed.create({userId: [], animeId: series._id, animeModel: 'Series'});
+        }
+    }
+    
+    for(let movie of allMovies){
+        const exists = await Viewed.findOne({animeId: movie._id, animeModel: 'Movies'});
+        if(!exists){
+            await Viewed.create({userId: [], animeId: movie._id, animeModel: 'Movies'});
+        }
+    }
+    
+    console.log('Viewed seeding completed');
+}
+
 async function ab(){
     let s=await Movies.find()
     for(i of s){
@@ -28,4 +50,4 @@ async function ab(){
     console.log('Done')
     }
 }
-module.exports=ab
+module.exports={ab,seedViewed}

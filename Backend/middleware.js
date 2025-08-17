@@ -53,18 +53,26 @@ const validateLogin = (req,res,next) => {
 }
 
 const validateEditUser = async(req,res,next) => {
-    let {userID,id,type} = req.body;
-    if(type=='s'){
-        let series = await Series.findById(id);
-        if(series.uploadedBy==userID)
-            next();
+    try{
+        const {refreshToken} = req.cookies;
+        const {id: userID} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        console.log(userID)
+        let {id,type} = req.body;
+        if(type=='series'){
+            let series = await Series.findById(id);
+            if(series.uploadedBy==userID)
+                return next();
+        }
+        else {
+            let movies = await Movies.findById(id);
+            if(movies.uploadedBy==userID)
+                return next();
+        }
+        return res.status(200).json({bool:false,msg:"User not have permission to edit"});
     }
-    else if(type=='m'){
-        let movies = await Movies.findById(id);
-        if(movies.uploadedBy==userID)
-            next();
+    catch(e){
+        res.status(500).json({bool:false,msg:"Authentication failed"});
     }
-    res.status(200).json({bool:false,msg:"User not have permission to edit"});
 }
 
 const validateSignup = (req,res,next) => {

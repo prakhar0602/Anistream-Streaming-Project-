@@ -6,32 +6,54 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { set_local_data1 } from '../../Redux/local_data_Slice'
 import { select } from '../../Redux/local_data_Slice'
-import logo from '../../Assets/loading.gif'
 import Genre from '../../Components/Genre_Template/Genre'
+import axios from 'axios'
 const Home = () => {
-
+  const {VITE_BACKEND_LINK}=import.meta.env
   let dispatch=useDispatch();
-  let [isLoading,setLoading]=useState(true)
   let {series,movies,most_latest}=useSelector(state=>state.local)
+  const [recommendations, setRecommendations] = useState([])
   
   useEffect(()=>{
-    async function ab(){
-      await dispatch(set_local_data1())
-      setLoading(false)
+    dispatch(set_local_data1())
+    fetchRecommendations()
+  },[])
+  
+  const fetchRecommendations = async () => {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/recommendations`, {
+        withCredentials: true
+      })
+      if(response.data.bool) {
+        setRecommendations(response.data.recommendations)
+      }
+    } catch (error) {
+      console.log('Failed to fetch recommendations:', error)
     }
-    ab()
-  },[]) 
+  } 
   return (
-    <div className='text-white'>
-      {
-    isLoading?
-    (<div className='w-full h-screen flex justify-center items-center'><img className='w-28' src={logo} />Loading</div>):(
+    <div className='text-white pb-32'>
       <div>
       {
         most_latest?(
           <Main_Anime x={most_latest}/>
           ):(<p></p>)
         }
+        {recommendations.length > 0 && (
+          <div className="lg:px-10 lg:py-7 p-5">
+            <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Recommended for You</p>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            {
+              recommendations.map((s,index)=>(
+                <Link key={s._id} to="/view" onClick={()=>dispatch(select(s))}>
+                  <Template series={s}/>
+                </Link>
+                ))
+              }
+          </div>
+        </div>
+        )}
+        
         <div className="lg:px-10 lg:py-7 p-5">
           <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
           <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
@@ -46,7 +68,7 @@ const Home = () => {
           <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
           <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
           {
-            series.map((s,index)=>(
+            [...series].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
               <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
               ))
             }
@@ -57,10 +79,20 @@ const Home = () => {
           <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Genres</p>
           <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
           {
-            series.map((s,index)=>(
-              <Link to="/view" onClick={()=>dispatch(select(s))}><Genre title="Heyt" image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMaONpgprNw2krJagQB6YspO2oYwQsg_96Fw&s" /></Link>
-              ))
-            }
+            ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy'].map((genre, index) => (
+              <Link key={index} to={`/genres/${genre}`}>
+                <Genre 
+                  title={genre} 
+                  image={`${['https://res.cloudinary.com/jerrick/image/upload/c_scale,f_jpg,q_auto/lgi39qi7kmzdipemivm1.jpg',
+       'https://static.toiimg.com/thumb/msid-108812406,width-1280,height-720,resizemode-4/108812406.jpg',
+       'https://cms.animecollective.com/wp-content/uploads/2023/04/best-comedy-anime-sket-dance.jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlH0Ymm-2VpaEo_7DM7GAm2OU9IRDUqPbszQ&s',
+      'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/the-greatest-fantasy-anime-of-all-time-december-2024.jpg?q=70&fit=contain&w=1200&h=628&dpr=1']
+      [index]}?w=400`} 
+                />
+              </Link>
+            ))
+          }
         </div>
       </div>
 
@@ -108,8 +140,6 @@ const Home = () => {
         </div>
       </div> */}
     </div>
-  )
-  }
             </div>
 
 

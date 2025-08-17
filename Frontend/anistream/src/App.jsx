@@ -21,15 +21,23 @@ import New from './Pages/New/New'
 import Upload from './Pages/New/Upload'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify'
+import Search from './Pages/Search'
+import Series from './Pages/Series/Series'
+import Movies from './Pages/Movies/Movies'
+import Loading from './Pages/Loading'
+import { useRouteLoading } from './hooks/useRouteLoading'
 function App() {
+  const isLoading = useRouteLoading();
+  
   return (
-    <div className='bg-[#0F1014] min-h-screen h-full w-full font-funky tracking-widest ' >
+    <div className='bg-[#0F1014] min-h-screen h-full w-full font-funky tracking-widest' >
       
       <Provider store={store}>
         <ToastContainer 
           position="top-center"
           autoClose={3000}
         />
+        {isLoading && <Loading />}
       <Nav />
       <div className='ml-[100px]'>
 
@@ -38,6 +46,7 @@ function App() {
         <Route path="/signup" element={<PrivateRoutes><Signup/></PrivateRoutes>}/>
         <Route path="/" element={<Home />} />
         <Route path="/genres" element={<ProtectedRoutes><Genres/></ProtectedRoutes>} />
+        <Route path="/genres/:genre" element={<ProtectedRoutes><Genres/></ProtectedRoutes>} />
         <Route path="/upload" element={<ProtectedRoutes><New/></ProtectedRoutes>} />
         <Route path="/upload/:type" element={<ProtectedRoutes><Upload/></ProtectedRoutes>} />
         <Route path="/edit" element={<ProtectedRoutes><Edit/></ProtectedRoutes>} />
@@ -45,6 +54,10 @@ function App() {
         <Route path="/episode-view" element={<ProtectedRoutes><Episode/></ProtectedRoutes>} />
         <Route path="/wishlist" element={<ProtectedRoutes><Wishlist/></ProtectedRoutes>} />
         <Route path="/results" element={<Results/>} />
+        <Route path="/search" element={<Search/>} />
+        <Route path="/series" element={<Series/>} />
+        <Route path="/movies" element={<Movies/>} />
+        <Route path="/loading" element={<Loading/>} />
 
         {/* <Route path="/login" element={<Login/> } />
         <Route path="/dashboard" element={<Dashboard/>}/>

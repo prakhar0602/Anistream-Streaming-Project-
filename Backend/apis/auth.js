@@ -9,7 +9,10 @@ const  {
     handleToggleWishlist,
     handleLogout,
     sendCode,
-    verifyCode
+    verifyCode,
+    handleAddViewed,
+    handleTraining,
+    handleGetRecommendations
 } = require('../controllers/auth')
 
 router.post('/add_user',validateSignup,handleAddUser );
@@ -27,5 +30,11 @@ router.post('/get_wishlist',refreshToken, handleFetchWishlist)
 router.post('/toggle_wishlist',refreshToken,handleToggleWishlist)
 
 router.get('/logout',refreshToken, handleLogout)
+
+router.post('/add_viewed', refreshToken, handleAddViewed)
+
+router.post('/training', refreshToken, handleTraining)
+
+router.get('/recommendations', refreshToken, handleGetRecommendations)
 
 module.exports = router;

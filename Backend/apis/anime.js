@@ -12,6 +12,8 @@ const {
   handleSearchQuery,
   handleExpiryNotification,
   handleFetchFoldersById,
+  handleFetchGenres,
+  handleFetchAnimeByGenre,
 } = require("../controllers/anime");
 
 router.get("/get_series", handleFetchSeries);
@@ -31,6 +33,10 @@ router.post("/get_info", handleFetchFileInfo);
 router.get("/search/:query", handleSearchQuery);
 
 router.get("/getSyncedfolders/:id",handleFetchFoldersById)
+
+router.get("/genres", handleFetchGenres);
+
+router.get("/genre/:genre", handleFetchAnimeByGenre);
 
 router.get(
   "/setExpiryNotification/:id/:type",

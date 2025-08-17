@@ -12,7 +12,7 @@ const { VITE_BACKEND_LINK } = import.meta.env;
 const Main_Anime_2 = (props) => {
   let name = props.x.name;
   let dispatch = useDispatch();
-  let genres = ["Action", "Adventure", "Drama"];
+  let genres =props.x.genres;
   let desc = props.x.desc;
   let files = props.x.episodes;
   let rating = props.x.avg_rating;

@@ -29,9 +29,9 @@ function logout1(state,action){
 }
 export async function check_user(){
     axios.defaults.withCredentials = true;
-    let response=await axios.get(`${VITE_BACKEND_LINK}/login_status`,{
+    let response=await axios.get(`${VITE_BACKEND_LINK}/verify_token`,{
     });
-    return response.data.login_status;
+    return response.data.bool;
 }
 export const userSlice=createSlice({
     name:'User',

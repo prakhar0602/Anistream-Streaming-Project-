@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Template_3 from '../../Components/Anime_list/Template_3/Template_3';
 import Main_Anime_2 from '../../Components/Anime_list/Main_Anime_2/Main_Anime_2';
 import { set_Episode } from '../../Redux/episodeSlice';
+import axios from 'axios';
+const {VITE_BACKEND_LINK}=import.meta.env
 const View = () => {
     let dispatch=useDispatch();
     let data=useSelector(state=>state.local.selected_anime)
@@ -13,7 +15,7 @@ const View = () => {
     let [seasons,setSeasons]=useState([])
     let [selectedfiles,setSelectFiles]=useState([])
     let [open,isOpen]=useState(false)
-    let [isLoading,setLoading]=useState(true)
+    let [isLoading,setLoading]=useState(false)
     let [preNEp,setPren]=useState(0)
     let navigate=useNavigate()
     useEffect(()=>{
@@ -28,7 +30,23 @@ const View = () => {
         b.push(data.episodes[i])
         setSelectFiles(b)
         console.log(b)
-        setLoading(false)
+        
+        // Add viewed record
+        try{
+          // axios.defaults.withCredentials = true;
+          console.log(
+            selectedfiles
+          )
+          await axios.post(`${VITE_BACKEND_LINK}/add_viewed`, {
+            animeId: data._id,
+            animeModel: data.type === 's' ? 'Series' : 'Movies'
+          },{
+            withCredentials:true
+          });
+        } catch(e) {
+          console.log('Failed to add viewed record:', e);
+        }
+        // setLoading(false)
       }
         ab();
     },[])
@@ -79,8 +97,8 @@ const View = () => {
         <div className="lg:w-[95%] ml-[23px] w-full grid lg:grid-cols-3 grid-cols-2 gap-y-10">
           {
             selectedfiles.map((f,index)=>(
-              <Link onClick={(e)=>select_Episode(e,index)}>
-              <Template_3 series={{name:`Episode ${index+1}`,cover_image:f.snap_link}}/>
+              <Link key={index} onClick={(e)=>select_Episode(e,index)}>
+              <Template_3 series={{name:`Episode ${index+1}`,cover_image:f?.snap_link || ''}}/>
               </Link>
               ))
             }

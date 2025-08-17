@@ -2,6 +2,7 @@ const user = require('../models/Users');
 const Wishlist=require('../models/WishList');
 const Series = require('../models/Series');
 const Movies = require('../models/Movies');
+const Viewed = require('../models/Viewed');
 const bcrypt = require('bcrypt')
 const jwt=require('jsonwebtoken')
 const OnlineUsers = require('../models/Online_Users');
@@ -52,10 +53,10 @@ const handleLogin = async (req, res) => {
         if(users){ 
             await bcrypt.compare(password,users.password,async function(err,result){
                 if(result){
-                    let token = jwt.sign({email,type:users.type},'Prakhar_Gupta',{
+                    let token = jwt.sign({id:users._id,email,type:users.type},'Prakhar_Gupta',{
                         expiresIn:60*5
                     });
-                    let refreshToken = jwt.sign({email,type:users.type},'Prakhar_Gupta',{
+                    let refreshToken = jwt.sign({id:users._id,email,type:users.type},'Prakhar_Gupta',{
                         expiresIn:'2h'
                     });
                     await OnlineUsers.create({email,token:refreshToken,expiryTime:Date.now()+1000*60*60*2,expireAt:Date.now()+(2*60*60*1000)});
@@ -192,11 +193,89 @@ const verifyCode = async(req,res) => {
     }
 }
 
+const handleAddViewed = async(req,res) => {
+    try{
+        const {animeId, animeModel} = req.body;
+        const {refreshToken} = req.cookies;
+        const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        
+        const existingViewed = await Viewed.findOne({animeId, animeModel});
+        
+        if(existingViewed) {
+            if(!existingViewed.userId.includes(userId)) {
+                existingViewed.userId.push(userId);
+                await existingViewed.save();
+            }
+        } else {
+            await Viewed.create({userId: [userId], animeId, animeModel});
+        }
+        
+        res.status(200).json({bool:true, msg:'Viewed added'});
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Something went wrong'});
+    }
+}
+
+const handleTraining = async(req,res) => {
+    try{
+        const allViewed = await Viewed.find().populate('animeId');
+        
+        const trainingData = allViewed.map(view => ({
+            user_ids: view.userId,
+            anime_id: view.animeId._id,
+            name: view.animeId.name,
+            genre: view.animeId.genres,
+            type: view.animeModel.toLowerCase()
+        }));
+        console.log(trainingData)
+        const axios = require('axios');
+        await axios.post(`http://localhost:5000/api/training`, trainingData);
+        res.status(200).json({bool:true, msg:'Training completed'});
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Training failed'});
+    }
+}
+
+const handleGetRecommendations = async(req,res) => {
+    try{
+        const {refreshToken} = req.cookies;
+        const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        
+        const axios = require('axios');
+        const response = await axios.post(`http://localhost:5000/api/get_recommendation`, {
+            user_id: userId
+        });
+        
+        const populatedRecommendations = [];
+        for(const rec of response.data.recommendations) {
+            if(rec.type === 'series') {
+                const anime = await Series.findById(rec.anime_id).populate('episodes rating');
+                if(anime) populatedRecommendations.push(anime);
+            } else {
+                const anime = await Movies.findById(rec.anime_id).populate('episodes rating');
+                if(anime) populatedRecommendations.push(anime);
+            }
+        }
+        
+        res.status(200).json({bool:true, recommendations: populatedRecommendations});
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get recommendations'});
+    }
+}
+
 module.exports = {
     handleAddUser,
     handleVerifyToken,
     handleLogin,
     handleFetchWishlist,
     handleToggleWishlist,
-    handleLogout,sendCode,verifyCode
+    handleLogout,
+    sendCode,
+    verifyCode,
+    handleAddViewed,
+    handleTraining,
+    handleGetRecommendations
 }

@@ -2,511 +2,334 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import logo from '../../../Assets/loading.gif'
 import { useSelector } from "react-redux";
+import { toast } from 'react-toastify';
+
 const {VITE_BACKEND_LINK}=import.meta.env
+
 const Edit = () => {
-  let [series, setSeries] = useState([]);
-  let [movies, setMovies] = useState([]);
-  let [list, getList] = useState([]);
-  let [isLoading,setLoading]=useState(false)
+  const [series, setSeries] = useState([]);
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('series');
+  const [editingItem, setEditingItem] = useState(null);
   const user = useSelector((state)=>state.user.user);
-  async function getSeries() {
-    setLoading(true)
-    let response = await axios.get(`${VITE_BACKEND_LINK}/get_series`);
-    response = response.data;
-    setSeries(response);
-    setMovies([]);
-    setLoading(false)
-  }
-  async function getMovies() {
-    setLoading(true)
-    let response = await axios.get(`${VITE_BACKEND_LINK}/get_movies`);
-    response = response.data;
-    setMovies(response);
-    setSeries([]);
-    setLoading(false)
-  }
-  async function rem(type, id) {
-    console.log(id)
-    let response = await axios.post(`${VITE_BACKEND_LINK}/delete_anime`, {
-        type,
-        id,
-    });
-  }
-  async function handleSubmitedit(e, id) {
-    setLoading(true)
-    e.preventDefault();
-    let fd = new FormData();
-    fd.append("id", id);
-    fd.append("name", e.target.name.value);
-    fd.append("cover_image", e.target.cover_image.value);
-    fd.append("big_image", e.target.big_image.value);
-    fd.append("desc", e.target.desc.value);
-    fd.append("fld_id", e.target.fld_id.value);
-    fd.append("nseasons", e.target.nseasons.value);
-    fd.append("nepisodes", e.target.nepisodes.value);
-    fd.append("type", e.target.type.value);
-    fd.append("userID", user._id);
-    let encoded = new URLSearchParams(fd).toString();
+  
+  useEffect(() => {
+    fetchData('series')
+  }, [])
+  
+  const genreOptions = [
+    "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", 
+    "Romance", "Sci-Fi", "Thriller", "Slice of Life", "Sports", "Supernatural", 
+    "Mecha", "Historical", "School", "Military", "Music", "Psychological"
+  ];
+
+  const fetchData = async (type) => {
+    setLoading(true);
     try {
-      let response = await axios.post(
-        `${VITE_BACKEND_LINK}/edit_anime`,
-        encoded,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const endpoint = type === 'series' ? '/get_series' : '/get_movies';
+      const response = await axios.get(`${VITE_BACKEND_LINK}${endpoint}`);
+      
+      if (type === 'series') {
+        setSeries(response.data);
+        setMovies([]);
+      } else {
+        setMovies(response.data);
+        setSeries([]);
+      }
+      setActiveTab(type);
     } catch (error) {
-      console.log(error);
+      toast.error(`Failed to fetch ${type}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading (false)
-  }
-  return (
-    <div>
-{
-          isLoading?(<div className="h-screen w-full flex justify-center items-center text-white">
-           <img src={logo} className="w-32" alt="" /> <p className="text-xl ">Loading</p>
-            </div>
-            ):(
-    <div className="w-full py-32 min-h-screen flex flex-col items-center justify-center">
-      <div className="flex">
-        <button
-          onClick={() => getSeries()}
-          className="hover:bg-gradient-to-r text-white inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
-          >
-          Edit Series
-        </button>
-        <button
-          onClick={() => getMovies()}
-          className="hover:bg-gradient-to-r text-white  inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
-          >
-          Edit Movies
-        </button>
-        <button
-          onClick={() => getUpdateList()}
-          className="hover:bg-gradient-to-r text-white  inline mr-2 ml-3 py-2.5 px-6 rounded-3xl bg-white/20"
-        >
-          Get Update List
-        </button>
-      </div>
-      <div>
-        {series.length == 0 ? (
-          <span></span>
-          ) : (
-            <div className="flex flex-col gap-14 items-center mt-14">
-            <h2 className="text-3xl font-bold text-white">Edit Series</h2>
-            {series.map((folder, index) => (
-              <div className="flex flex-col items-center gap-5">
-                <h3 className="text-white font-mono text-2xl">{folder.name}</h3>
-                <form
-                  className="flex flex-col gap-4 w-50 justify-center items-center"
-                  onSubmit={(e) => handleSubmitedit(e, folder._id)}
-                  >
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="name"
-                      >
-                      Name Of Series
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.name)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="big_image"
-                      >
-                      Big Image
-                    </label>
-                    <input
-                      type="text"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      id="big_image"
-                      name="big_image"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.big_image)
-                        : (e.target.value = e.target.value);
-                      }}
-                      required
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="cover_image"
-                      >
-                      Cover Image
-                    </label>
-                    <input
-                      type="text"
-                      id="cover_image"
-                      name="cover_image"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.cover_image)
-                        : (e.target.value = e.target.value);
-                      }}
-                      required
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="desc"
-                      >
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      id="desc"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="desc"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.desc)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="fld_id"
-                      >
-                      Folder ID
-                    </label>
-                    <input
-                      type="text"
-                      id="fld_id"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="fld_id"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.fld_id)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="nepisodes"
-                      >
-                      Episodes
-                    </label>
-                    <input
-                      type="text"
-                      id="nepisodes"
-                      name="nepisodes"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.nepisodes)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="nseasons"
-                      >
-                      Seasons
-                    </label>
-                    <input
-                      type="text"
-                      id="nseasons"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="nseasons"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.nseasons)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <legend className="text-white font-mono text-[18px]">
-                      Type
-                    </legend>
-                    <div className="flex gap-[110px]">
-                      <div className="text-white flex gap-[15px] text-[18px] font-sans">
-                        <label
-                          className="text-white font-mono text-[18px]"
-                          htmlFor="movie"
-                          >
-                          Movies
-                        </label>
-                        <input
-                          type="radio"
-                          id="movie"
-                          name="type"
-                          className="scale-150"
-                          value="movies"
-                          />
-                      </div>
-                      <div className="text-white flex gap-[15px] text-[18px] font-sans">
-                        <label
-                          htmlFor="series"
-                          className="text-white font-mono text-[18px]"
-                          >
-                          Series
-                        </label>
-                        <input
-                          type="radio"
-                          id="series"
-                          name="type"
-                          className="scale-150"
-                          value="series"
-                          />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="btns">
-                    <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
-                      type="button"
-                      onClick={() => rem(folder.type, folder._id)}
-                      >
-                      Remove
-                    </button>
-                    <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
-                      type="submit"
-                      >
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
-            ))}
-          </div>
-        )}
-        {movies.length == 0 ? (
-          <span></span>
-        ) : (
-          <div className="flex flex-col gap-14 items-center mt-14">
-            <h2 className="text-3xl font-bold text-white">Edit Movies</h2>
-            {movies.map((folder, index) => (
-              <div className="flex flex-col items-center gap-5">
-                <h3 className="text-white font-mono text-2xl">{folder.name}</h3>
-                <form
-                  className="flex flex-col gap-4 w-50 justify-center items-center"
-                  onSubmit={(e) => handleSubmitedit(e, folder._id)}
-                  >
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="name"
-                      >
-                      Name Of Series
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.name)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="big_image"
-                      >
-                      Big Image
-                    </label>
-                    <input
-                      type="text"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      id="big_image"
-                      name="big_image"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.big_image)
-                        : (e.target.value = e.target.value);
-                      }}
-                      required
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="cover_image"
-                      >
-                      Cover Image
-                    </label>
-                    <input
-                      type="text"
-                      id="cover_image"
-                      name="cover_image"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.cover_image)
-                        : (e.target.value = e.target.value);
-                      }}
-                      required
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="desc"
-                      >
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      id="desc"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="desc"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.desc)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="fld_id"
-                      >
-                      Folder ID
-                    </label>
-                    <input
-                      type="text"
-                      id="fld_id"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="fld_id"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.fld_id)
-                          : (e.target.value = e.target.value);
-                        }}
-                        />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="nepisodes"
-                      >
-                      Episodes
-                    </label>
-                    <input
-                      type="text"
-                      id="nepisodes"
-                      name="nepisodes"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.nepisodes)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <label
-                      className="text-white font-mono text-[18px]"
-                      htmlFor="nseasons"
-                      >
-                      Seasons
-                    </label>
-                    <input
-                      type="text"
-                      id="nseasons"
-                      className="outline-none p-[10px] ml-[10px] grey border-[1.5px] border-white text-[25px] rounded-[10px]"
-                      name="nseasons"
-                      onChange={(e) => {
-                        e.target.value == "same"
-                        ? (e.target.value = folder.nseasons)
-                        : (e.target.value = e.target.value);
-                      }}
-                      />
-                  </div>
-                  <div className="flex w-full justify-between items-center">
-                    <legend className="text-white font-mono text-[18px]">
-                      Type
-                    </legend>
-                    <div className="flex gap-[110px]">
-                      <div className="text-white flex gap-[15px] text-[18px] font-sans">
-                        <label
-                          className="text-white font-mono text-[18px]"
-                          htmlFor="movie"
-                          >
-                          Movies
-                        </label>
-                        <input
-                          type="radio"
-                          id="movie"
-                          name="type"
-                          className="scale-150"
-                          value="movies"
-                          />
-                      </div>
-                      <div className="text-white flex gap-[15px] text-[18px] font-sans">
-                        <label
-                          htmlFor="series"
-                          className="text-white font-mono text-[18px]"
-                          >
-                          Series
-                        </label>
-                        <input
-                          type="radio"
-                          id="series"
-                          name="type"
-                          className="scale-150"
-                          value="series"
-                          />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="btns">
-                    <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
-                      type="button"
-                      onClick={() => rem(folder.type, folder._id)}
-                      >
-                      Remove
-                    </button>
-                    <button
-                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[20px] border-0 ml-[50%] text-white font-fantasy bg-white/20"
-                      type="submit"
-                      >
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
-            ))}
-          </div>
-        )}
-        {
-          list.length==0 ? (<span></span>):(<div className="flex flex-col gap-14 items-center mt-14">
-              
-          </div>)
+  };
+
+  const handleDelete = async (type, id, name) => {
+    if (window.confirm(`Are you sure you want to delete "${name}"? This will delete all related data.`)) {
+      try {
+        setLoading(true);
+        await axios.post(`${VITE_BACKEND_LINK}/delete_anime`, { type, id });
+        
+        if (type === 's') {
+          setSeries(series.filter(item => item._id !== id));
+        } else {
+          setMovies(movies.filter(item => item._id !== id));
         }
-      </div>
-    </div>)}
+        
+        toast.success('Anime deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete anime');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleEdit = async (formData, id, type) => {
+    setLoading(true);
+    try {
+      const payload = {
+        id,
+        name: formData.name,
+        cover_image: formData.cover_image,
+        cover_image2: formData.cover_image2 || formData.cover_image,
+        big_image: formData.big_image,
+        desc: formData.desc,
+        fld_id: formData.fld_id,
+        nseasons: formData.nseasons,
+        nepisodes: formData.nepisodes,
+        type: activeTab,
+        userID: user._id,
+        genres: formData.genres || []
+      };
+      console.log('Sending payload:', payload)
+      const response = await axios.post(`${VITE_BACKEND_LINK}/edit_anime`, payload,{
+        withCredentials:true
+      });
+      console.log('Edit response:', response.data)
+      
+      toast.success('Anime updated successfully');
+      setEditingItem(null);
+      await fetchData(activeTab);
+    } catch (error) {
+      console.error('Edit error:', error);
+      toast.error('Failed to update anime');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const EditForm = ({ item, type, onSave, onCancel }) => {
+    const [formData, setFormData] = useState({
+      name: item.name,
+      cover_image: item.cover_image,
+      cover_image2: item.cover_image2 || '',
+      big_image: item.big_image,
+      desc: item.desc,
+      fld_id: item.fld_id,
+      nseasons: item.nseasons,
+      nepisodes: item.nepisodes,
+      genres: item.genres || []
+    });
+    
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      // console.log(formData)
+      onSave(formData, item._id, type);
+    };
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-[#1a1a1a] rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <h3 className="text-xl font-bold text-white mb-4">Edit {item.name}</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="p-3 rounded bg-gray-800 text-white border border-gray-600"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Cover Image URL"
+                value={formData.cover_image}
+                onChange={(e) => setFormData({...formData, cover_image: e.target.value})}
+                className="p-3 rounded bg-gray-800 text-white border border-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="Cover Image 2 URL"
+                value={formData.cover_image2}
+                onChange={(e) => setFormData({...formData, cover_image2: e.target.value})}
+                className="p-3 rounded bg-gray-800 text-white border border-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="Big Image URL"
+                value={formData.big_image}
+                onChange={(e) => setFormData({...formData, big_image: e.target.value})}
+                className="p-3 rounded bg-gray-800 text-white border border-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="Folder ID"
+                value={formData.fld_id}
+                onChange={(e) => setFormData({...formData, fld_id: e.target.value})}
+                className="p-3 rounded bg-gray-800 text-white border border-gray-600"
+              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Episodes"
+                  value={formData.nepisodes}
+                  onChange={(e) => setFormData({...formData, nepisodes: e.target.value})}
+                  className="p-3 rounded bg-gray-800 text-white border border-gray-600 flex-1"
+                />
+                <input
+                  type="text"
+                  placeholder="Seasons"
+                  value={formData.nseasons}
+                  onChange={(e) => setFormData({...formData, nseasons: e.target.value})}
+                  className="p-3 rounded bg-gray-800 text-white border border-gray-600 flex-1"
+                />
+              </div>
+            </div>
+            <textarea
+              placeholder="Description"
+              value={formData.desc}
+              onChange={(e) => setFormData({...formData, desc: e.target.value})}
+              className="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 h-24"
+            />
+            <div>
+              <label className="text-white block mb-2">Genres:</label>
+              <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto bg-gray-800 p-3 rounded border border-gray-600">
+                {genreOptions.map(genre => (
+                  <label key={genre} className="flex items-center gap-2 text-white cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.genres.includes(genre)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({...formData, genres: [...formData.genres, genre]});
+                        } else {
+                          setFormData({...formData, genres: formData.genres.filter(g => g !== genre)});
+                        }
+                      }}
+                    />
+                    <span className="text-sm">{genre}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
+    );
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center text-white bg-[#121212]">
+        <img src={logo} className="w-32" alt="Loading" />
+        <p className="text-xl ml-4">Loading...</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-[#121212] text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-center">Edit Anime Content</h1>
+        
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-8">
+          <button
+            onClick={() => fetchData('series')}
+            className={`px-6 py-3 rounded-l-lg font-medium transition ${
+              activeTab === 'series' 
+                ? 'bg-orange-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            Edit Series ({series.length})
+          </button>
+          <button
+            onClick={() => fetchData('movies')}
+            className={`px-6 py-3 rounded-r-lg font-medium transition ${
+              activeTab === 'movies' 
+                ? 'bg-orange-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            Edit Movies ({movies.length})
+          </button>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {(activeTab === 'series' ? series : movies).map((item) => (
+            <div key={item._id} className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-700 transition">
+              <img 
+                src={item.cover_image} 
+                alt={item.name}
+                className="w-full h-48 object-cover"
+                onError={(e) => e.target.src = '/placeholder.jpg'}
+              />
+              <div className="p-4">
+                <h3 className="font-bold text-lg mb-2 truncate">{item.name}</h3>
+                <p className="text-gray-400 text-sm mb-2 line-clamp-2">{item.desc}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {item.genres?.slice(0, 3).map(genre => (
+                    <span key={genre} className="bg-orange-600 text-xs px-2 py-1 rounded">
+                      {genre}
+                    </span>
+                  ))}
+                  {item.genres?.length > 3 && (
+                    <span className="text-gray-400 text-xs">+{item.genres.length - 3}</span>
+                  )}
+                </div>
+                <div className="text-sm text-gray-400 mb-3">
+                  <p>Episodes: {item.nepisodes} | Seasons: {item.nseasons}</p>
+                  <p>Rating: {item.avg_rating?.toFixed(1) || 'N/A'}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setEditingItem(item)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.type, item._id, item.name)}
+                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Empty State */}
+        {(activeTab === 'series' ? series : movies).length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-lg">
+              No {activeTab} found. Click the button above to load {activeTab}.
+            </p>
+          </div>
+        )}
+        
+        {/* Edit Modal */}
+        {editingItem && (
+          <EditForm
+            item={editingItem}
+            type={activeTab}
+            onSave={handleEdit}
+            onCancel={() => setEditingItem(null)}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

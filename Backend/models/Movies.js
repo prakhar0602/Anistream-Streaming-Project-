@@ -6,6 +6,7 @@ const moviesSchema = mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    index: true,
   },
   big_image: {
     type: String,
@@ -17,10 +18,16 @@ const moviesSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
+  cover_image2: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   desc: {
     type: String,
     required: true,
     trim: true,
+    index: true,
   },
   fld_id: {
     type: String,
@@ -59,7 +66,15 @@ const moviesSchema = mongoose.Schema({
   expiryTime:{
     type:Number,
     required:true
-  }
+  },
+  uploadedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Users"
+  },
+  genres: [{
+    type: String,
+    trim: true
+  }]
 });
 const Movies = mongoose.model("Movies", moviesSchema);
 module.exports = Movies;

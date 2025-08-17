@@ -8,6 +8,7 @@ const FolderList = ({ folder, setFolder }) => {
   useEffect(() => {
     async function fetchFolders() {
       try {
+        console.log(user._id);
         let response = await axios.get(
           `${VITE_BACKEND_LINK}/getSyncedfolders/${user._id}`
       );

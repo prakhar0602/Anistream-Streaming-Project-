@@ -41,12 +41,21 @@ const Nav = () => {
     }
   }
   async function search() {
-    let results = await axios.get(`${VITE_BACKEND_LINK}/search/${query}`);
-    if (results.data.bool) {
-      dispatch(setResults(results.data.results));
-      navigate("/results");
-    } else {
-      toast.warning("Something went wrong", { position: "bottom-right" });
+    if (!query.trim()) {
+      toast.warning("Please enter a search term", { position: "bottom-right" });
+      return;
+    }
+    
+    try {
+      let results = await axios.get(`${VITE_BACKEND_LINK}/search/${encodeURIComponent(query.trim())}`);
+      if (results.data.bool) {
+        dispatch(setResults(results.data.results));
+        navigate("/results");
+      } else {
+        toast.warning(results.data.message || "No results found", { position: "bottom-right" });
+      }
+    } catch (error) {
+      toast.error("Search failed. Please try again.", { position: "bottom-right" });
     }
   }
   return (
@@ -142,7 +151,7 @@ const Nav = () => {
             </button>
           </li>
           <li>
-            <button onClick={()=>changeURL("/genre")} >
+            <button onClick={()=>changeURL("/genres")} >
               <div className="flex gap-5 hover:text-white">
               <p className="  w-[100px] text-center">
                 <ion-icon name="logo-octocat"></ion-icon>

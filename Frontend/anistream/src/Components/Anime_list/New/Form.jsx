@@ -15,7 +15,14 @@ const Form = () => {
   const [nseasons, setSeasons] = useState("");
   const [type, setType] = useState("");
   const [fld_id, setFld_id] = useState("");  // Folder ID
+  const [genres, setGenres] = useState([]);
   const user = useSelector((state) => state.user.user);
+
+  const genreOptions = [
+    "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", 
+    "Romance", "Sci-Fi", "Thriller", "Slice of Life", "Sports", "Supernatural", 
+    "Mecha", "Historical", "School", "Military", "Music", "Psychological"
+  ];
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -36,6 +43,7 @@ const Form = () => {
     formData.append("fld_id", fld_id);
     formData.append("type", type);
     formData.append("userID",user._id);
+    formData.append("genres", JSON.stringify(genres));
 
     try {
       let response = await axios.post(`${VITE_BACKEND_LINK}/add_anime`, new URLSearchParams(formData).toString(), {
@@ -112,6 +120,30 @@ const Form = () => {
                 <label className="text-white font-mono text-[18px]" htmlFor="nseasons">Seasons</label>
                 <input type="text" id="nseasons" value={nseasons} onChange={(e) => setSeasons(e.target.value)}
                   className="outline-none p-[10px] ml-[10px] border-[1.5px] border-white text-[25px] rounded-[10px]" />
+              </div>
+
+              <div className="flex w-full justify-between items-center">
+                <label className="text-white font-mono text-[18px]" htmlFor="genres">Genres</label>
+                <div className="border-[1.5px] border-white rounded-[10px] p-2 ml-[10px] h-32 overflow-y-auto bg-white">
+                  {genreOptions.map(genre => (
+                    <label key={genre} className="flex items-center gap-2 text-black cursor-pointer hover:bg-gray-100 p-1">
+                      <input
+                        type="checkbox"
+                        value={genre}
+                        checked={genres.includes(genre)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setGenres([...genres, genre]);
+                          } else {
+                            setGenres(genres.filter(g => g !== genre));
+                          }
+                        }}
+                        className="scale-125"
+                      />
+                      <span className="text-sm">{genre}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="flex w-full justify-between items-center">

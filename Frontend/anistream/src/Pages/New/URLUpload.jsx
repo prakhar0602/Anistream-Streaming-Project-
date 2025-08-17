@@ -47,9 +47,12 @@ const URLUpload = () => {
     try {
       for (let url of files) {
         await axios.get(
-          `https://api.streamwish.com/api/upload/url?fld_id=${fld_id}&key=11124m28yb5z5qbkuh1ru&url=${url}`
+          `https://api.streamwish.com/api/upload/url?fld_id=${fld_id}&key=11124m28yb5z5qbkuh1ru&url=${encodeURIComponent(url)}`,{
+            withCredentials:false
+          }
         );
       }
+      toast.success("Uploaded ")
       sessionStorage.setItem("error", "[]");
       setUploaded(true);
     } catch (error) {

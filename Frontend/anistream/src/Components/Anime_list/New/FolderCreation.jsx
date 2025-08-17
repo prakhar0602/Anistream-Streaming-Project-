@@ -14,11 +14,9 @@ const FolderCreation = ({ user }) => {
 
     if (user.type !== "admin") {
       toast.warning("Request Rejected", { position: "top-center" });
-    
       return;
     }
 
-    console.log("Folder Created");
 
     try {
       // Create folder on server

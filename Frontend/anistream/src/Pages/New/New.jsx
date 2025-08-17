@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import LoadingScreen from "../../Components/LoadingScreen";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import addAnime from "../../Assets/AddAnime.png"
 import bimage from '../../Assets/anime_moon_landscape.jpg'
+import FolderCreation from "../../Components/Anime_list/New/FolderCreation";
 
 const New = () => {
   const [showFileUpload, setFileUpload] = useState(false);
@@ -11,6 +12,8 @@ const New = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     setLoading(false)
@@ -19,9 +22,7 @@ const New = () => {
   return (
     <div className="w-full max-w-full h-screen pt-24 pb-3 bg-cover"
     style={{ backgroundImage: `url(${bimage})` }}>
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
+      {!isLoading && (
         <div className="h-full w-full max-w-full flex flex-col justify-center items-center gap-9">
           <div className="flex justify-center items-center">
             {/* <img
@@ -38,48 +39,63 @@ const New = () => {
             <h3>{message}</h3>
           </div>
 
-          <div className="w-full h-[100%] flex gap-14 justify-center px-14">
-            <div className="flex items-center gap-5 w-[100%]  text-black text-[25px] justify-around">
-              <div className="flex flex-col gap-5 justify-center items-center">
-
-              <Link
-                to="/upload/files"
-                className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[40px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
-                 duration-200 ease-in"
-                >
-                Upload Files
-              </Link>
-              <Link
-                    className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[30px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
-                 duration-200 ease-in"
-                    to="/upload/sync"
-                    >
-                <p className="flex justify-center items-center gap-1">
-                  <ion-icon name="sync"></ion-icon>
-                  Sync
-                </p>
-              </Link>
-                  </div>
-<div className="flex flex-col gap-5 justify-center items-center">
-              <Link
-                to="/upload/edit"
-                className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[30px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
-                 duration-200 ease-in"
-                >
-                <ion-icon name="sync"></ion-icon>Edit
-              </Link>
-<Link
-                to="/upload/url"
-                className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[40px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
-                 duration-200 ease-in"
-                >
-                Upload By URL
-              </Link>
-                  </div>
-            </div>
+          <div className="flex justify-center mb-8">
+            <button
+              onClick={() => setShowCreateFolder(!showCreateFolder)}
+              className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[30px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
+               duration-200 ease-in"
+            >
+              {showCreateFolder ? "Close" : "Create Folder"}
+            </button>
           </div>
+          {!showCreateFolder && (
+            <div className="w-full h-[100%] flex gap-14 justify-center px-14">
+              <div className="flex items-center gap-5 w-[100%]  text-black text-[25px] justify-around">
+                <div className="flex flex-col gap-5 justify-center items-center">
+
+                <Link
+                  to="/upload/files"
+                  className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[40px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
+                   duration-200 ease-in"
+                  >
+                  Upload Files
+                </Link>
+                <Link
+                      className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[30px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
+                   duration-200 ease-in"
+                      to="/upload/sync"
+                      >
+                  <p className="flex justify-center items-center gap-1">
+                    <ion-icon name="sync"></ion-icon>
+                    Sync
+                  </p>
+                </Link>
+                    </div>
+  <div className="flex flex-col gap-5 justify-center items-center">
+                <Link
+                  to="/upload/edit"
+                  className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[30px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
+                   duration-200 ease-in"
+                  >
+                  <ion-icon name="sync"></ion-icon>Edit
+                </Link>
+  <Link
+                  to="/upload/url"
+                  className="rounded-[15px] h-fit w-fit py-[10px] px-[30px] text-[40px] border-0  text-black font-fantasy bg-white/60 hover:scale-110 transition-all 
+                   duration-200 ease-in"
+                  >
+                  Upload By URL
+                </Link>
+                    </div>
+              </div>
+            </div>
+          )}
+          {showCreateFolder && (
+            <div className="flex justify-center mt-8">
+              <FolderCreation user={user} />
+            </div>
+          )}
         </div>
-        
       )}
     </div>
   );

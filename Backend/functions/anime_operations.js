@@ -3,6 +3,7 @@ const Series = require("../models/Series");
 const Movies = require("../models/Movies");
 const Reviews = require("../models/Reviews");
 const Rating = require("../models/Rating");
+const Viewed = require("../models/Viewed");
 const { fetchFileList, fetchFileInfo } = require("./streamwishApi");
 const user = require("../models/Users");
 
@@ -63,7 +64,7 @@ const findAnime = async(id,type)=>{
 
 
 
-async function addAnime(name,cover_image,cover_image2,big_image,desc,fld_id,type,nseasons,nepisodes,userID){
+async function addAnime(name,cover_image,cover_image2,big_image,desc,fld_id,type,nseasons,nepisodes,userID,genres=[]){
     let trating=0
     let avg_rating=0 
     let episodes=[]
@@ -80,40 +81,68 @@ async function addAnime(name,cover_image,cover_image2,big_image,desc,fld_id,type
         // console.log(time)
         minTime = Math.min((time.getTime()+90*24*60*60*1000),minTime);
     }
+    let newAnime;
     if(type==='series'){
-        await Series.create({name,cover_image,cover_image2,big_image,desc,fld_id,episodes,nepisodes,nseasons,trating,avg_rating,type:'s',expiryTime:minTime,uploadedBy:userID});
+        newAnime = await Series.create({name,cover_image,cover_image2,big_image,desc,fld_id,episodes,nepisodes,nseasons,trating,avg_rating,type:'s',expiryTime:minTime,uploadedBy:userID,genres});
+        await Viewed.create({userId: [], animeId: newAnime._id, animeModel: 'Series'});
     }else{
-        await Movies.create({name,cover_image,cover_image2,big_image,desc,fld_id,episodes,trating,avg_rating,type:'m',nepisodes,nseasons,expiryTime:minTime,uploadedBy:userID});
+        newAnime = await Movies.create({name,cover_image,cover_image2,big_image,desc,fld_id,episodes,trating,avg_rating,type:'m',nepisodes,nseasons,expiryTime:minTime,uploadedBy:userID,genres});
+        await Viewed.create({userId: [], animeId: newAnime._id, animeModel: 'Movies'});
     }
 }
 
-async function editAnime(name,cover_image,cover_image2,big_image,desc,fld_id,type,nseasons,nepisodes,id,userId){
+async function editAnime(name,cover_image,cover_image2,big_image,desc,fld_id,type,nseasons,nepisodes,id,userId,genres){ 
+    console.log('editAnime function - received genres:', genres);
     if(type==='series'){
-        await Series.findByIdAndUpdate(id,{name,cover_image,cover_image2,big_image,desc,fld_id,nepisodes,nseasons,type:'s',uploadedBy:userId});
+        const result = await Series.findByIdAndUpdate(id,{name,cover_image,cover_image2,big_image,desc,fld_id,nepisodes,nseasons,uploadedBy:userId,genres}, {new: true});
+        console.log('Updated series genres:', result.genres);
     }else{
-        await Movies.findByIdAndUpdate(id,{name,cover_image,cover_image2,big_image,desc,fld_id,nepisodes,nseasons,type:'m',uploadedBy:userId});
+        const result = await Movies.findByIdAndUpdate(id,{name,cover_image,cover_image2,big_image,desc,fld_id,nepisodes,nseasons,uploadedBy:userId,genres}, {new: true});
+        console.log('Updated movies genres:', result.genres);
     }
 }
 
 async function deleteAnime(id,type){
-    let x
-    if(type=='s'){
-        // x=await Series.findById(id);
-        x=await Series.findByIdAndDelete(id)
-    }
-    else{
-        // x=await Movies.findById(id);
-        x=await Movies.findByIdAndDelete(id) 
-    }
-    for(i of x.episodes){
-        let y=await Episodes.findByIdAndDelete(i)
-        for(j of y.reviews){
-            await Reviews.findByIdAndDelete(j)
+    try {
+        let anime;
+        if(type=='s'){
+            anime = await Series.findById(id).populate('episodes rating');
+            if(!anime) throw new Error('Series not found');
+        } else {
+            anime = await Movies.findById(id).populate('episodes rating');
+            if(!anime) throw new Error('Movie not found');
         }
+        
+        // Delete all episodes and their reviews
+        for(let episode of anime.episodes){
+            // Delete reviews for this episode
+            await Reviews.deleteMany({episode: episode._id});
+            // Delete the episode
+            await Episodes.findByIdAndDelete(episode._id);
+        }
+        
+        // Delete all ratings for this anime
+        await Rating.deleteMany({anime: id});
+        
+        // Delete from wishlist collections
+        const WishList = require('../models/WishList');
+        await WishList.updateMany(
+            {}, 
+            { $pull: { [type === 's' ? 'series' : 'movies']: id } }
+        );
+        
+        // Finally delete the main anime document
+        if(type=='s'){
+            await Series.findByIdAndDelete(id);
+        } else {
+            await Movies.findByIdAndDelete(id);
+        }
+        
+        console.log(`Successfully deleted ${type === 's' ? 'series' : 'movie'} with ID: ${id}`);
+    } catch (error) {
+        console.error('Error deleting anime:', error);
+        throw error;
     }
-    for(i of x.rating){
-        await Rating.findByIdAndDelete(i);
-    } 
 }
 
 async function getSeries(){
@@ -126,14 +155,51 @@ async function getMovies(){
 }
 async function searchQuery(query){
     let results={series:[],movies:[]};
-    if(query.length==0)
+    if(!query || query.trim().length === 0)
         return results;
-    let all_series=await Series.find().populate('rating episodes').exec();
-    let all_movies=await Movies.find().populate('rating episodes').exec();
-    let series = all_series.filter((x)=>x.name.toLowerCase().includes(query.toLowerCase()))
-    let movies = all_movies.filter((x)=>x.name.toLowerCase().includes(query.toLowerCase()))
-    results = {series,movies}
+    
+    const searchTerm = query.trim().toLowerCase();
+    
+    try {
+        const allSeries = await Series.find().populate('rating episodes').exec();
+        const allMovies = await Movies.find().populate('rating episodes').exec();
+        
+        const series = allSeries.filter(item => 
+            item.name.toLowerCase().includes(searchTerm)
+        );
+        
+        const movies = allMovies.filter(item => 
+            item.name.toLowerCase().includes(searchTerm)
+        );
+        
+        results = { series, movies };
+    } catch (error) {
+        console.error('Search error:', error);
+        results = { series: [], movies: [] };
+    }
+    
     return results;
 }
 
-module.exports={findAnime,addAnime,editAnime,deleteAnime,getSeries,getMovies,searchQuery,fetchFileCode}
+async function getGenres(){
+    const series = await Series.find({}, 'genres').exec();
+    const movies = await Movies.find({}, 'genres').exec();
+    
+    const allGenres = new Set();
+    [...series, ...movies].forEach(item => {
+        if(item.genres && Array.isArray(item.genres)){
+            item.genres.forEach(genre => allGenres.add(genre));
+        }
+    });
+    
+    return Array.from(allGenres).slice(0, 10);
+}
+
+async function getAnimeByGenre(genre){
+    const series = await Series.find({ genres: genre }).populate('rating episodes').exec();
+    const movies = await Movies.find({ genres: genre }).populate('rating episodes').exec();
+    
+    return { series, movies };
+}
+
+module.exports={findAnime,addAnime,editAnime,deleteAnime,getSeries,getMovies,searchQuery,fetchFileCode,getGenres,getAnimeByGenre}

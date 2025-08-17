@@ -4,7 +4,8 @@ const seriesSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    index: true
   },
   big_image: {
     type: String,
@@ -24,7 +25,8 @@ const seriesSchema = new mongoose.Schema({
   desc: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    index: true
   },
   fld_id: {
     type: String,
@@ -68,7 +70,11 @@ const seriesSchema = new mongoose.Schema({
   uploadedBy:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"Users"
-  }
+  },
+  genres: [{
+    type: String,
+    trim: true
+  }]
 });
 
 const Series = mongoose.model('Series', seriesSchema);

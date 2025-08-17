@@ -68,6 +68,7 @@ let task1 = async()=>{
     await expiryData.save();
     console.log('end')
 }
+// ab.seedViewed()
 
 let task2 = async()=>{
     let expiryData = await expirySeries.find().populate('series movies');
@@ -102,13 +103,84 @@ let task2 = async()=>{
     console.log("end")
 }
 
+let sendTrainingData = async() => {
+    try {
+        console.log('Starting training data collection...');
+        
+        const viewingData = await ViewingHistory.find({
+            viewedAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+        }).populate({
+            path: 'anime',
+            select: 'name genres type'
+        }).populate({
+            path: 'user',
+            select: '_id'
+        });
+        
+        const trainingData = {};
+        
+        for (const view of viewingData) {
+            if (!view.anime) continue;
+            
+            const animeId = view.anime._id.toString();
+            if (!trainingData[animeId]) {
+                trainingData[animeId] = {
+                    anime_id: animeId,
+                    name: view.anime.name,
+                    genre: view.anime.genres || [],
+                    type: view.anime.type,
+                    user_ids: []
+                };
+            }
+            
+            const userId = view.user._id.toString();
+            if (!trainingData[animeId].user_ids.includes(userId)) {
+                trainingData[animeId].user_ids.push(userId);
+            }
+        }
+        
+        const formattedData = Object.values(trainingData);
+        
+        if (formattedData.length > 0) {
+            const response = await axios.post(
+                `${process.env.RECOMMENDATION_API_URL || 'http://localhost:5000'}/api/training`,
+                formattedData,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            console.log('Training data sent successfully:', response.data);
+        } else {
+            console.log('No new viewing data to send');
+        }
+    } catch (error) {
+        console.error('Error sending training data:', error.message);
+    }
+};
+
 cron.schedule('0 0 * * *',task1);
 cron.schedule('0 0 1 */2 *', task2);
+cron.schedule('0 0 * * 0', sendTrainingData);
 // task1()`
 async function abx(){
 await expirySeries.create({series:[],movies:[]})
 }
 // abx()
-app.listen(PORT,()=>{
+const server = app.listen(PORT,()=>{
     console.log("Server is started at",PORT);
-}) 
+})
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Process terminated');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+        console.log('Process terminated');
+        process.exit(0);
+    });
+}); 

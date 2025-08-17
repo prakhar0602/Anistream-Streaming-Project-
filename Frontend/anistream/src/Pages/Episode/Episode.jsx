@@ -1,9 +1,5 @@
-// Initializations
 import React, { useEffect, useState } from "react";
-// import "./Episode.css";
 import axios from "axios";
-import logo from '../../Assets/loading.gif'
-import logo1 from '../../Assets/loading....gif'
 import { Link } from "react-router-dom";
 import { useSelector , useDispatch} from "react-redux";
 import { fetchReviews, set_Episode} from "../../Redux/episodeSlice";
@@ -12,7 +8,7 @@ const Episode = () => {
 
   // Variables Initialization
   let dispatch=useDispatch()
-  let [isLoading,setLoading]=useState(true)
+
   const [title,setTitle]=useState('')
   const [views,setViews]=useState('')
   let {index,files,prevFiles,user_liked,user_disliked,nxtFiles,iframeCode,reviews,id,likes,dislikes}=useSelector(state=>state.episode)
@@ -61,124 +57,158 @@ const Episode = () => {
     dispatch(fetchReviews(files[index].file_code))
   }
   return (
-    <div className="min-h-screen w-full flex justify-center items-center">
-       {
-          title==''?(<div className="h-full w-full flex justify-center items-center text-white">
-           <img src={logo} className="w-32" alt="" /> <p className="text-xl ">Loading</p>
-            </div>
-            ):(<div className="flex flex-col xl:flex-row m-0 lg:p-32 p-5 gap-10 min-h-screen w-fit">
-
-       <div className="flex flex-col items-start">
-        {
-          iframeCode ? (
-            <div className="bg-white/20 text-white text-bold w-[calc(100vw-40px)] max-w-[888px] lg:w-full">
-              <div className='xl:w-[888px] lg:h-[500px] w-full h-[calc(100vw*0.5125)] ' dangerouslySetInnerHTML={{ __html: iframeCode }} />
-                <div className="flex flex-col lg:p-5 p-2 gap-3">
-                  <p className="m-0 lg:text-3xl text-xl font-bold ">{title}</p>
-                  <p className="m-0 lg:text-md text-sm">{views} views</p>
-                  <div className="flex gap-6">
-                    <div className="flex items-center gap-1 lg:text-xl text-lg pointer">
-                    {
-                      user_liked?(
-                        <div className= 'text-red-600'>
-
-                      <ion-icon name="thumbs-up"  onClick={()=>toggle('dislikes','likes')}></ion-icon>
-                        </div>
-                    ):(
-                      <div className= 'text-white'>
-
-                      <ion-icon name="thumbs-up" onClick={()=>toggle('dislikes','likes')}></ion-icon>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+      <div className="container mx-auto px-4 py-6">
+        {title === '' ? (
+          <div className="flex justify-center items-center h-96">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <p className="ml-4 text-xl">Loading episode...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            <div className="xl:col-span-3">
+              {iframeCode && (
+                <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl">
+                  <div className="aspect-video">
+                    <iframe
+                      src={iframeCode}
+                      width="100%"
+                      height="100%"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h1 className="text-2xl lg:text-3xl font-bold mb-3">{title}</h1>
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-gray-400">{views} views</p>
+                      <div className="flex items-center gap-6">
+                        <button
+                          onClick={() => toggle('dislikes', 'likes')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:bg-gray-700 ${
+                            user_liked ? 'text-orange-500 bg-gray-700' : 'text-gray-300'
+                          }`}
+                        >
+                          <ion-icon name="thumbs-up"></ion-icon>
+                          <span>{likes.length}</span>
+                        </button>
+                        <button
+                          onClick={() => toggle('likes', 'dislikes')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:bg-gray-700 ${
+                            user_disliked ? 'text-red-500 bg-gray-700' : 'text-gray-300'
+                          }`}
+                        >
+                          <ion-icon name="thumbs-down"></ion-icon>
+                          <span>{dislikes.length}</span>
+                        </button>
                       </div>
-                      )
-                    }
-                    <p>{likes.length}</p>
                     </div>
-                    <div className="flex items-center gap-1 lg:text-xl text-lg pointer ">
-                   {
-                     user_disliked?(
-                       <div className= 'text-red-600'>
-
-                      <ion-icon name="thumbs-down" onClick={()=>toggle('likes','dislikes')}></ion-icon>
-                        </div>):(
-                          <div className= 'text-white'>
-                      <ion-icon name="thumbs-down" onClick={()=>toggle('likes','dislikes')}></ion-icon>
-                    </div>
-                    )
-                  }
-                    <p>{dislikes.length}</p>
                   </div>
+                </div>
+              )}
+              
+              <div className="mt-8 bg-gray-800 rounded-xl p-6">
+                <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <ion-icon name="chatbubbles"></ion-icon>
+                  Comments ({reviews.length})
+                </h3>
+                
+                <form onSubmit={handleSubmit} className="mb-6">
+                  <input type="hidden" name="name" value={JSON.parse(localStorage.getItem('User')).username} />
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      name="comment"
+                      placeholder="Add a comment..."
+                      className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 transition-colors"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </form>
+                
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {reviews.map((comment, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-orange-400">{comment.name}</span>
+                        {comment.name === JSON.parse(localStorage.getItem('User')).username && (
+                          <button
+                            onClick={() => del(comment._id)}
+                            className="text-red-400 hover:text-red-300 text-sm px-2 py-1 rounded transition-colors"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-gray-200">{comment.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {files.length > 1 && (
+              <div className="xl:col-span-1">
+                <div className="bg-gray-800 rounded-xl p-6 sticky top-6">
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <ion-icon name="play-circle"></ion-icon>
+                    Episodes
+                  </h2>
+                  <div className="space-y-3 max-h-[70vh] overflow-y-auto scrollbar-hide">
+                    {prevFiles.map((episode, i) => (
+                      <button
+                        key={i}
+                        onClick={() => changeIndex(i)}
+                        className="w-full group relative overflow-hidden rounded-lg transition-transform hover:scale-105"
+                      >
+                        <img
+                          src={episode.snap_link}
+                          alt={`Episode ${i + 1}`}
+                          className="w-full aspect-video object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+                          <span className="text-white font-semibold">Episode {i + 1}</span>
+                        </div>
+                      </button>
+                    ))}
+                    {nxtFiles.map((episode, i) => (
+                      <button
+                        key={i + index + 1}
+                        onClick={() => changeIndex(i + index + 1)}
+                        className="w-full group relative overflow-hidden rounded-lg transition-transform hover:scale-105"
+                      >
+                        <img
+                          src={episode.snap_link}
+                          alt={`Episode ${i + index + 2}`}
+                          className="w-full aspect-video object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+                          <span className="text-white font-semibold">Episode {i + index + 2}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
-          )
-          :(
-            <div></div>
-            )
-          }
-         <div className="flex flex-col mx-auto my-14 p-5 bg-white/20 w-[calc(100vw-40px)] lg:w-full">
-          <h3 className="text-white text-xl font-medium mb-4">
-            Comments
-            </h3>
-          <div className="flex gap-1 mb-1 p-2  shadow-[0_1px_3px_rgba(0, 0, 0, 0.1)]">
-            <form className='flex items-center gap-1 w-full' onSubmit={handleSubmit}>
-              <div className="hidden">
-                <input type="hidden" name='name' id='name' value={JSON.parse(localStorage.getItem('User')).username} />
-              </div>
-              <div className="">
-                <label className="font-bold mb-1 mr-2 " htmlFor="comment">Comment:</label>
-                <input className='mx-2 my-1 text-md outline-none p-2' type="text" name='comment' id='comment' />
-              </div>
-              <button className="px-2 py-1 border-0 ml-14 w-24 rounded-sm cursor-pointer bg-[#3a98e6] text-lg">Post</button>
-            </form>
+            )}
           </div>
-          <div className="flex flex-col gap-1">
-            {
-              reviews.map((a,index)=>(
-                <div className="rounded-lg mt-2 text-white bg-[#00000025] border-[1px] border-black shadow-[0_1px_3px_rgba(0, 0, 0, 0.1)]" key={index}>
-                  <p className="p-2 bg-black/20 text-white">{a.name}</p>
-                  <p className="p-2">{a.comment}</p>
-                  {
-                    a.name==(JSON.parse(localStorage.getItem('User'))).username?
-                    (<button className='bg-white rounded text-black p-1 ml-1 mb-1' onClick={()=>del(a._id)}>Delete</button>)
-                    :(
-                      ''
-                      )
-                    }
-                </div>
-              ))              
-            }
-          </div>
-        </div>
+        )}
       </div>
-      {
-        files.length>1?(
-      <div className="flex flex-col items-center lg:w-72 w-full">
-        <p className="text-3xl text-white w-full text-center pb-5 border-b-2">Episodes</p>
-        <div className="flex flex-col gap-2 h-[calc(100vh-200px)] no-scrollbar overflow-y-scroll mt-5">
-          {
-            prevFiles.map((m, i) => (
-              <Link className="relative" onClick={()=>changeIndex(i)}>
-                <div className="flex pointer flex-col  items-center justify-center">
-                  <img className='w-72' src={m.snap_link} alt="img" />
-                  <p className="flex absolute justify-center text-3xl text-white bg-black/70 hover:bg-black/40 w-full h-full items-center">Episode {i + 1}</p>
-                </div>
-              </Link>
-            ))
-          }
-          {
-            nxtFiles.map((m, i) => (
-              <Link className="relative" onClick={()=>changeIndex(i+index+1)}>
-              <div className="flex pointer flex-col  items-center justify-center">
-                <img className='w-72' src={m.snap_link} alt="img" />
-                <p className="flex absolute justify-center text-3xl text-white hover:bg-black/40 bg-black/70 w-full h-full items-center" >Episode {i + index + 2}</p>
-              </div>
-            </Link>
-            ))
-          }
-        </div>
-      </div>):(<span></span>)} 
-       </div>
-       )}
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
