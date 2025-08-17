@@ -43,13 +43,13 @@ const Home = () => {
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Recommended for You</p>
             <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-            {
+            {/* {
               recommendations.map((s,index)=>(
                 <Link key={s._id} to="/view" onClick={()=>dispatch(select(s))}>
                   <Template series={s}/>
                 </Link>
                 ))
-              }
+              } */}
           </div>
         </div>
         )}
