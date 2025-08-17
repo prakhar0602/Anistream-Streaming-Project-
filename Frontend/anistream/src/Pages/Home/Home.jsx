@@ -54,26 +54,30 @@ const Home = () => {
         </div>
         )}
         
-        <div className="lg:px-10 lg:py-7 p-5">
-          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
-          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-          {
-            series.map((s,index)=>(
-             <Template series={s} key={s.fld_id}/>
-              ))
-            }
+        {series && series.length > 0 && (
+          <div className="lg:px-10 lg:py-7 p-5">
+            <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            {
+              series.map((s,index)=>(
+               <Template series={s} key={s.fld_id}/>
+                ))
+              }
+          </div>
         </div>
-      </div>
-        <div className="lg:px-10 lg:py-7 p-5">
-          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
-          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-          {
-            [...series].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
-              <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
-              ))
-            }
+        )}
+        {series && series.length > 0 && (
+          <div className="lg:px-10 lg:py-7 p-5">
+            <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            {
+              [...series].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
+                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                ))
+              }
+          </div>
         </div>
-      </div>
+        )}
 
       <div className="lg:px-10 lg:py-7 p-5">
           <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Genres</p>
@@ -97,27 +101,30 @@ const Home = () => {
       </div>
 
 
-        <div className="lg:px-10 lg:py-7 p-5">
-          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Series</p>
-          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-          {
-            series.map((s,index)=>(
-              <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
-              ))
-            }
+        {series && series.length > 0 && (
+          <div className="lg:px-10 lg:py-7 p-5">
+            <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Series</p>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            {
+              series.map((s,index)=>(
+                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                ))
+              }
+          </div>
         </div>
-      </div>
-      <div className="lg:px-10 lg:py-7 p-5"> 
-          <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Movies</p>
-          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
-          {
-            
-            movies.map((s,index)=>(
-              <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
-              ))
-            }
+        )}
+        {movies && movies.length > 0 && (
+          <div className="lg:px-10 lg:py-7 p-5"> 
+            <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Movies</p>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            {
+              movies.map((s,index)=>(
+                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                ))
+              }
+          </div>
         </div>
-      </div>
+        )}
       {/* <div className="lg:p-12 p-5">
           <p className='lg:text-3xl text-2xl lg:mb-8 mb-4'>Trending</p>
           <div className='flex xl:flex-col overflow-scroll no-scrollbar gap-8 lg:p-4 p-1 lg:mx-8 mx-3'>
