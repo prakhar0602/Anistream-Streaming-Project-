@@ -6,8 +6,10 @@ class ModelService:
     @classmethod
     def initialize(cls):
         if cls._model is None:
-            cls._model = SentenceTransformer('./sentence_transformer_model')
-            print("Model loaded successfully")
+            # Use a smaller, more memory-efficient model
+            model_name = 'all-MiniLM-L6-v2'  # Much smaller than custom model
+            cls._model = SentenceTransformer(model_name)
+            print(f"Model {model_name} loaded successfully")
     
     @classmethod
     def get_model(cls):

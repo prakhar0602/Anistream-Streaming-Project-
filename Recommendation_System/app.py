@@ -5,8 +5,8 @@ from services.model_service import ModelService
 def create_app():
     app = Flask(__name__)
     
-    # Initialize model service
-    ModelService.initialize()
+    # Lazy load model only when needed
+    # ModelService.initialize() - removed to save startup memory
     
     # Register blueprints
     app.register_blueprint(api_bp, url_prefix='/api')

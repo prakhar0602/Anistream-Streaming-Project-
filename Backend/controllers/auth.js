@@ -220,13 +220,13 @@ const handleAddViewed = async(req,res) => {
 const handleTraining = async(req,res) => {
     try{
         const allViewed = await Viewed.find().populate('animeId');
-        
+        console.log(allViewed)
         const trainingData = allViewed.map(view => ({
             user_ids: view.userId,
             anime_id: view.animeId._id,
             name: view.animeId.name,
             genre: view.animeId.genres,
-            type: view.animeModel.toLowerCase()
+            type: view.animeModel.toLowerCase() 
         }));
         console.log(trainingData)
         const axios = require('axios');
@@ -234,6 +234,7 @@ const handleTraining = async(req,res) => {
         res.status(200).json({bool:true, msg:'Training completed'});
     }
     catch(e){
+        console.log(e)
         res.status(500).json({bool:false, msg:'Training failed'});
     }
 }
