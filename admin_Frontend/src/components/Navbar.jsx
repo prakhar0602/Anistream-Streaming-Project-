@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, DollarSign, ArrowDownToLine, ArrowUpFromLine, Settings } from "lucide-react";
+import { Home, Users, Brain, ArrowDownToLine, ArrowUpFromLine, Settings } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -80,7 +80,8 @@ export default function Navbar() {
         ></div>
       )}
     </>
-  )
+  );
+}
 
 export function Sidebar() {
   const navigate = useNavigate();
@@ -101,9 +102,11 @@ export function Sidebar() {
         </div>
         <div className="text-xs text-center">Users</div>
       </div>
-      <div className="flex flex-col items-center opacity-70">
-        <div className="p-4 rounded-xl mb-2"><DollarSign size={24}/></div>
-        <div className="text-xs text-center">Withdrawal</div>
+      <div className={`flex flex-col items-center cursor-pointer ${isActive('/recommendations') ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`} onClick={() => navigate('/recommendations')}>
+        <div className={`p-4 rounded-xl mb-2 ${isActive('/recommendations') ? 'bg-red-500' : 'hover:bg-white/10'}`}>
+          <Brain size={24} className="text-white"/>
+        </div>
+        <div className="text-xs text-center leading-tight">Recommendation<br/>System</div>
       </div>
       <div className="flex flex-col items-center opacity-70">
         <div className="p-4 rounded-xl mb-2"><ArrowUpFromLine size={24}/></div>
