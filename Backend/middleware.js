@@ -9,6 +9,7 @@ const refreshToken = async (req,res,next)=>{
     try{
         let token = req.cookies.accessToken;
         let refreshToken = req.cookies.refreshToken;
+        console.log(refreshToken)
         let currents = await Online_Users.find({token:refreshToken})
         console.log(currents)
         if(refreshToken==undefined || currents.length==0){
@@ -101,6 +102,7 @@ const validateUploadPermission = async(req,res,next) => {
     try{
         const {refreshToken} = req.cookies;
         const {type} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        console.log(type)
         if(type === 'admin' || type === 'cc'){
             return next();
         }

@@ -266,10 +266,10 @@ const handleGetRecommendations = async(req,res) => {
         const populatedRecommendations = [];
         for(const rec of response.data.recommendations) {
             if(rec.type === 'series') {
-                const anime = await Series.findById(rec.anime_id).populate('episodes rating');
+                const anime = await Series.findById(rec.anime_id).populate('seasons rating');
                 if(anime) populatedRecommendations.push(anime);
             } else {
-                const anime = await Movies.findById(rec.anime_id).populate('episodes rating');
+                const anime = await Movies.findById(rec.anime_id).populate('seasons rating');
                 if(anime) populatedRecommendations.push(anime);
             }
         }

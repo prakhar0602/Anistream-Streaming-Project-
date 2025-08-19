@@ -26,7 +26,7 @@ const Form = () => {
   async function handleSubmit(event) {
     event.preventDefault();
     
-    if (user.type !== 'admin') {
+    if (user.type == 'user') {
       toast.warning('Request Rejected', { position: 'top-center' });
       return;
     }
@@ -46,7 +46,8 @@ const Form = () => {
     try {
       let response = await axios.post(`${VITE_BACKEND_LINK}/add_anime`, new URLSearchParams(formData).toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        timeout: 120000, // 2 minutes timeout
+        withCredentials: true,
+        timeout: 120000
       });
       // console.log(response)
       response=response.data.data
