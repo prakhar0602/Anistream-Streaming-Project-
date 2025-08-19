@@ -1,9 +1,13 @@
 from flask import Flask
+from flask_cors import CORS
 from api.routes import api_bp
 from services.model_service import ModelService
 
 def create_app():
     app = Flask(__name__)
+    
+    # Enable CORS
+    CORS(app)
     
     # Initialize model at startup to avoid repeated downloads
     ModelService.initialize()

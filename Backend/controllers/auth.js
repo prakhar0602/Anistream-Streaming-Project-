@@ -244,7 +244,8 @@ const handleTraining = async(req,res) => {
         }));
         console.log(trainingData)
         const axios = require('axios');
-        await axios.post(`http://localhost:5000/api/training`, trainingData);
+        await axios.post(`https://anistream-streaming-project-2.onrender.com/api/training`, trainingData);
+        console.log("Training done")
         res.status(200).json({bool:true, msg:'Training completed'});
     }
     catch(e){
@@ -259,7 +260,7 @@ const handleGetRecommendations = async(req,res) => {
         const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
         
         const axios = require('axios');
-        const response = await axios.post(`http://localhost:5000/api/get_recommendation`, {
+        const response = await axios.post(`https://anistream-streaming-project-2.onrender.com/api/get_recommendation`, {
             user_id: userId
         });
         
@@ -374,7 +375,7 @@ const handleGetOnlineUsers = async(req,res) => {
 const handleDownloadCSV = async(req,res) => {
     try{
         const axios = require('axios');
-        const response = await axios.get(`http://localhost:5000/api/download_csv`, {
+        const response = await axios.get(`https://anistream-streaming-project-2.onrender.com/api/download_csv`, {
             responseType: 'stream'
         });
         
