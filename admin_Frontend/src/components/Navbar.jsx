@@ -51,7 +51,7 @@ export default function Sidebar() {
             <Home size={20} className="text-white"/>
             <span className="text-white">Dashboard</span>
           </div>
-          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/users')}>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/online-users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/online-users')}>
             <Users size={20} className="text-white"/>
             <span className="text-white">Online Users</span>
           </div>
@@ -63,7 +63,7 @@ export default function Sidebar() {
             <UserPlus size={20} className="text-white"/>
             <span className="text-white">Content Creators</span>
           </div>
-          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/all-users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/all-users')}>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/users')}>
             <Eye size={20} className="text-white"/>
             <span className="text-white">Users</span>
           </div>

@@ -42,6 +42,10 @@ const  {
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
     handleGetAllUsers,
+    handleGetContentCreators,
+    handleGetCreatorContent,
+    handleGetRegularUsers,
+    handleForceLogout,
     handleGetUserProfile,
     handleEditProfile,
     handleDownloadCSV
@@ -441,6 +445,85 @@ router.put('/edit_profile', refreshToken, handleEditProfile)
  *         description: Admin access required
  */
 router.get('/all_users', refreshToken, validateAdmin, handleGetAllUsers)
+
+/**
+ * @swagger
+ * /content_creators:
+ *   get:
+ *     summary: Get all content creators with stats (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Content creators retrieved successfully
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/content_creators', refreshToken, validateAdmin, handleGetContentCreators)
+
+/**
+ * @swagger
+ * /creator_content/{creatorId}:
+ *   get:
+ *     summary: Get content by specific creator (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: creatorId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Creator content retrieved successfully
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/creator_content/:creatorId', refreshToken, validateAdmin, handleGetCreatorContent)
+
+/**
+ * @swagger
+ * /regular_users:
+ *   get:
+ *     summary: Get all regular users - Admin only
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Regular users retrieved successfully
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/regular_users', refreshToken, validateAdmin, handleGetRegularUsers)
+
+/**
+ * @swagger
+ * /force_logout:
+ *   post:
+ *     summary: Force logout a user - Admin only
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ *       403:
+ *         description: Admin access required
+ */
+router.post('/force_logout', refreshToken, validateAdmin, handleForceLogout)
 
 /**
  * @swagger

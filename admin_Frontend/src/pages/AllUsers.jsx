@@ -20,7 +20,7 @@ export default function AllUsers() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8080/all_users', {
+      const response = await fetch('http://localhost:8080/regular_users', {
         credentials: 'include'
       });
       const data = await response.json();

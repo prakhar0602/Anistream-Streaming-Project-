@@ -422,6 +422,84 @@ const handleGetAllUsers = async(req,res) => {
     }
 }
 
+const handleGetContentCreators = async(req,res) => {
+    try{
+        const creators = await user.find({type: 'cc'}).select('username email profile_image');
+        const creatorStats = await Promise.all(creators.map(async (creator) => {
+            const seriesCount = await Series.countDocuments({uploadedBy: creator._id});
+            const moviesCount = await Movies.countDocuments({uploadedBy: creator._id});
+            return {
+                ...creator.toObject(),
+                seriesCount,
+                moviesCount,
+                totalContent: seriesCount + moviesCount
+            };
+        }));
+        
+        res.status(200).json({
+            bool: true,
+            creators: creatorStats,
+            totalCreators: creators.length
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get content creators'});
+    }
+}
+
+const handleGetCreatorContent = async(req,res) => {
+    try{
+        const {creatorId} = req.params;
+        const [series, movies] = await Promise.all([
+            Series.find({uploadedBy: creatorId}).select('name cover_image avg_rating createdAt'),
+            Movies.find({uploadedBy: creatorId}).select('name cover_image avg_rating createdAt')
+        ]);
+        
+        res.status(200).json({
+            bool: true,
+            series,
+            movies,
+            totalContent: series.length + movies.length
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get creator content'});
+    }
+}
+
+const handleGetRegularUsers = async(req,res) => {
+    try{
+        console.log('Fetching regular users with type: user');
+        const regularUsers = await user.find({type: 'user'}).select('username email type profile_image createdAt');
+        console.log('Found regular users:', regularUsers.length);
+        
+        res.status(200).json({
+            bool: true,
+            users: regularUsers,
+            totalUsers: regularUsers.length
+        });
+    }
+    catch(e){
+        console.log('Error in handleGetRegularUsers:', e);
+        res.status(500).json({bool:false, msg:'Failed to get regular users'});
+    }
+}
+
+const handleForceLogout = async(req,res) => {
+    try{
+        const {email} = req.body;
+        await OnlineUsers.deleteOne({email});
+        
+        res.status(200).json({
+            bool: true,
+            msg: 'User logged out successfully'
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to logout user'});
+    }
+}
+
 const handleEditProfile = async(req,res) => {
     try{
         const {refreshToken} = req.cookies;
@@ -466,6 +544,10 @@ module.exports = {
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
     handleGetAllUsers,
+    handleGetContentCreators,
+    handleGetCreatorContent,
+    handleGetRegularUsers,
+    handleForceLogout,
     handleGetUserProfile,
     handleEditProfile,
     handleDownloadCSV

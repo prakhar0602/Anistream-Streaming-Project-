@@ -9,10 +9,13 @@ const refreshToken = async (req,res,next)=>{
     try{
         let token = req.cookies.accessToken;
         let refreshToken = req.cookies.refreshToken;
-        if(refreshToken==undefined){
+        let currents = await Online_Users.find({token:refreshToken})
+        console.log(currents)
+        if(refreshToken==undefined || currents.length==0){
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
             return res.json({bool:false})
         }
-        let currents = await Online_Users.find({token:refreshToken})
         for(let current of currents){
             if(token==undefined && Date.now()<=current.expiryTime){
                 let {email} = jwt.verify(refreshToken,'Prakhar_Gupta');
