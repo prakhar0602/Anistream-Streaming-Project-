@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { select } from "../../../Redux/local_data_Slice";
-import { useDispatch } from "react-redux";
+import axios from "axios";
 // import './template.css'
+const {VITE_BACKEND_LINK} = import.meta.env;
 const Template = (props) => {
   let name = props.series.name;
   let image = props.series.cover_image;
@@ -10,15 +10,52 @@ const Template = (props) => {
   let avg_rating = props.series.avg_rating;
   let description = props.series.desc;
   const [hovered, setHovered] = useState(false);
+  const [inWishlist, setInWishlist] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    checkWishlistStatus();
+  }, []);
+  
+  async function checkWishlistStatus() {
+    try {
+      const userId = JSON.parse(localStorage.getItem("User"))?._id;
+      if (!userId) return;
+      
+      const response = await axios.post(`${VITE_BACKEND_LINK}/get_wishlist`, {
+        id: userId,
+      });
+      
+      const wishlistData = response.data;
+      const relevantList = props.series.type === "s" ? wishlistData.series : wishlistData.movies;
+      setInWishlist(relevantList.some(item => item._id === props.series._id));
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  }
+  
+  async function toggleWishlist() {
+    try {
+      const userId = JSON.parse(localStorage.getItem("User"))?._id;
+      if (!userId) return;
+      
+      const response = await axios.post(`${VITE_BACKEND_LINK}/toggle_wishlist`, {
+        x: props.series,
+        id: userId,
+      });
+      
+      setInWishlist(response.data.y);
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+    }
+  }
+  
   function goTo(){
-    dispatch(select(props.series))
-    navigate("/view")
+    navigate(`/view/${props.series._id}`)
   }
   return (
     <div
-      className="w-[163px] h-[217px]  hover:w-[20vw] hover:h-[50vh] transition-all duration-500 ease-in-out bg-[#16181F]"
+      className="w-[163px] h-[217px] flex-shrink-0 hover:w-[20vw] hover:h-[50vh] transition-all duration-500 ease-in-out bg-[#16181F]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -35,9 +72,14 @@ const Template = (props) => {
                   <p>Watch Now</p>
                 </div>
               </button>
-              <button className="bg-[#575757] flex h-full aspect-square justify-center items-center  rounded-md">
+              <button 
+                className={`flex h-full aspect-square justify-center items-center rounded-md transition-colors duration-200 ${
+                  inWishlist ? 'bg-green-600 hover:bg-green-700' : 'bg-[#575757] hover:bg-[#666666]'
+                }`}
+                onClick={toggleWishlist}
+              >
                 <p className="text-white flex">
-                  <ion-icon name="add"></ion-icon>
+                  <ion-icon name={inWishlist ? "checkmark" : "add"}></ion-icon>
                 </p>
               </button>
             </div>

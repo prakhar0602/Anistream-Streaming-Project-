@@ -8,6 +8,20 @@ const fetchFileInfo = async(file_code)=>{
     return x;
 }
 
+const fetchFolderList = async(fld_id)=>{
+    let response=await axios.get(`https://api.streamwish.com/api/folder/list?key=${process.env.API_KEY}&fld_id=${fld_id}`);
+    console.log(response)
+    response=response.data.result.folders;
+     response.sort((x,y)=>{
+        if(x.name<y.name)
+        return -1
+        else
+        return 1
+      })
+    return response;
+    
+}
+
 const fetchFileList = async(fld_id)=>{
     let response=await axios.get(`https://api.streamwish.com/api/file/list?key=${process.env.API_KEY}&fld_id=${fld_id}`);
     response=response.data.result.files;
@@ -21,4 +35,4 @@ const fetchFileList = async(fld_id)=>{
     return response;
 }
 
-module.exports = {fetchFileInfo,fetchFileList};
+module.exports = {fetchFileInfo,fetchFileList,fetchFolderList};

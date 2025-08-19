@@ -1,65 +1,130 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { useSelector , useDispatch} from "react-redux";
-import { fetchReviews, set_Episode} from "../../Redux/episodeSlice";
+import { Link, useParams, useNavigate } from "react-router-dom";
 const {VITE_BACKEND_LINK}=import.meta.env
 const Episode = () => {
+  const { animeId, episodeId } = useParams();
+  const navigate = useNavigate();
 
-  // Variables Initialization
-  let dispatch=useDispatch()
+  const [animeData, setAnimeData] = useState(null)
+  const [currentEpisode, setCurrentEpisode] = useState(null)
+  const [allEpisodes, setAllEpisodes] = useState([])
+  const [title, setTitle] = useState('')
+  const [views, setViews] = useState('')
+  const [iframeCode, setIframeCode] = useState('')
+  const [reviews, setReviews] = useState([])
+  const [likes, setLikes] = useState([])
+  const [dislikes, setDislikes] = useState([])
+  const [userLiked, setUserLiked] = useState(false)
+  const [userDisliked, setUserDisliked] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const [title,setTitle]=useState('')
-  const [views,setViews]=useState('')
-  let {index,files,prevFiles,user_liked,user_disliked,nxtFiles,iframeCode,reviews,id,likes,dislikes}=useSelector(state=>state.episode)
-
-  // Fetching and setting of files from Server 
   useEffect(() => {
-    async function ab(){
-      setTitle('')
-      let response=await axios.get(`https://api.streamwish.com/api/file/info?key=11124m28yb5z5qbkuh1ru&file_code=${files[index].file_code}`)
+    fetchAnimeAndEpisode()
+  }, [animeId, episodeId])
+
+  const fetchAnimeAndEpisode = async () => {
+    try {
+      setIsLoading(true)
+      const response = await axios.get(`${VITE_BACKEND_LINK}/anime/${animeId}`)
+      const anime = response.data
+      setAnimeData(anime)
+      
+      // Flatten all episodes
+      let episodes = []
+      anime.seasons.forEach(season => {
+        episodes.push(...season.episodes)
+      })
+      setAllEpisodes(episodes)
+      
+      // Find current episode
+      const episode = episodes.find(ep => ep._id === episodeId)
+      if (episode) {
+        setCurrentEpisode(episode)
+        await fetchEpisodeDetails(episode.file_code)
+        await fetchReviews(episode._id)
+      }
+      
+      setIsLoading(false)
+    } catch (error) {
+      console.log('Failed to fetch anime/episode:', error)
+      setIsLoading(false)
+    }
+  }
+  
+  const fetchEpisodeDetails = async (fileCode) => {
+    try {
+      const response = await axios.get(`https://api.streamwish.com/api/file/info?key=11124m28yb5z5qbkuh1ru&file_code=${fileCode}`)
       setViews(response.data.result[0].file_views)
-      await dispatch(fetchReviews(files[index].file_code))
       setTitle(response.data.result[0].file_title)
+      setIframeCode(`<IFRAME SRC="https://hglink.to/e/${fileCode}" FRAMEBORDER=0 MARGINWIDTH=0 MARGINHEIGHT=0 SCROLLING=NO WIDTH=100% HEIGHT=100% allowfullscreen style="width:100%;height:100%;"></IFRAME>`)
+    } catch (error) {
+      console.log('Failed to fetch episode details:', error)
     }
-    ab()
-  }, [index]);
+  }
+  
+  const fetchReviews = async (episodeId) => {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/get_reviews/${episodeId}`)
+      setReviews(response.data.reviews || [])
+      setLikes(response.data.likes || [])
+      setDislikes(response.data.dislikes || [])
+      
+      const userId = JSON.parse(localStorage.getItem('User'))?._id
+      setUserLiked(response.data.likes?.includes(userId) || false)
+      setUserDisliked(response.data.dislikes?.includes(userId) || false)
+    } catch (error) {
+      console.log('Failed to fetch reviews:', error)
+    }
+  }
   
   
-  // change of index value
-  async function changeIndex(i){
-    let a={
-      index:i  
-    }
-    // await dispatch(fetchReviews(files[i].file_code))
-    await dispatch(set_Episode(a))
+  const changeEpisode = (episode) => {
+    navigate(`/episode-view/${animeId}/${episode._id}`)
   }
 
 
-  // handle Submit 
-  async function handleSubmit(e){
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let response=await axios.post(`${VITE_BACKEND_LINK}/add_review`,{name:e.target.name.value,comment:e.target.comment.value,id:files[index].file_code});
-    dispatch(fetchReviews(files[index].file_code))
-    e.target.name.value="";
-    e.target.comment.value="";
+    try {
+      await axios.post(`${VITE_BACKEND_LINK}/add_review`, {
+        name: e.target.name.value,
+        comment: e.target.comment.value,
+        id: currentEpisode._id
+      });
+      await fetchReviews(currentEpisode._id)
+      e.target.name.value = ""
+      e.target.comment.value = ""
+    } catch (error) {
+      console.log('Failed to add review:', error)
+    }
   }
-  async function toggle(preop,op){
-    let uid=(JSON.parse(localStorage.getItem('User'))._id)
-    console.log(uid)
-    console.log(id)
-    await axios.get(`${VITE_BACKEND_LINK}/toggle/${preop}/${op}/${id}/${uid}`)
-    dispatch(fetchReviews(files[index].file_code))
+  
+  const toggle = async (preop, op) => {
+    try {
+      const uid = JSON.parse(localStorage.getItem('User'))?._id
+      await axios.get(`${VITE_BACKEND_LINK}/toggle/${preop}/${op}/${currentEpisode._id}/${uid}`)
+      await fetchReviews(currentEpisode._id)
+    } catch (error) {
+      console.log('Failed to toggle like/dislike:', error)
+    }
   }
-  // update Reviews
-  async function del(did){
-    await axios.post(`${VITE_BACKEND_LINK}/delete_review`,{id,did})
-    dispatch(fetchReviews(files[index].file_code))
+  
+  const deleteReview = async (reviewId) => {
+    try {
+      await axios.post(`${VITE_BACKEND_LINK}/delete_review`, {
+        id: currentEpisode._id,
+        did: reviewId
+      })
+      await fetchReviews(currentEpisode._id)
+    } catch (error) {
+      console.log('Failed to delete review:', error)
+    }
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       <div className="container mx-auto px-4 py-6">
-        {title === '' ? (
+        {isLoading ? (
           <div className="flex justify-center items-center h-96">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
             <p className="ml-4 text-xl">Loading episode...</p>
@@ -69,14 +134,7 @@ const Episode = () => {
             <div className="xl:col-span-3">
               {iframeCode && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl">
-                  <div className="aspect-video">
-                    <iframe
-                      src={iframeCode}
-                      width="100%"
-                      height="100%"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
+                  <div className="aspect-video" dangerouslySetInnerHTML={{ __html: iframeCode }}>
                   </div>
                   <div className="p-6">
                     <h1 className="text-2xl lg:text-3xl font-bold mb-3">{title}</h1>
@@ -86,7 +144,7 @@ const Episode = () => {
                         <button
                           onClick={() => toggle('dislikes', 'likes')}
                           className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:bg-gray-700 ${
-                            user_liked ? 'text-orange-500 bg-gray-700' : 'text-gray-300'
+                            userLiked ? 'text-orange-500 bg-gray-700' : 'text-gray-300'
                           }`}
                         >
                           <ion-icon name="thumbs-up"></ion-icon>
@@ -95,7 +153,7 @@ const Episode = () => {
                         <button
                           onClick={() => toggle('likes', 'dislikes')}
                           className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:bg-gray-700 ${
-                            user_disliked ? 'text-red-500 bg-gray-700' : 'text-gray-300'
+                            userDisliked ? 'text-red-500 bg-gray-700' : 'text-gray-300'
                           }`}
                         >
                           <ion-icon name="thumbs-down"></ion-icon>
@@ -137,9 +195,9 @@ const Episode = () => {
                     <div key={index} className="bg-gray-700 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-orange-400">{comment.name}</span>
-                        {comment.name === JSON.parse(localStorage.getItem('User')).username && (
+                        {comment.name === JSON.parse(localStorage.getItem('User'))?.username && (
                           <button
-                            onClick={() => del(comment._id)}
+                            onClick={() => deleteReview(comment._id)}
                             className="text-red-400 hover:text-red-300 text-sm px-2 py-1 rounded transition-colors"
                           >
                             Delete
@@ -153,7 +211,7 @@ const Episode = () => {
               </div>
             </div>
             
-            {files.length > 1 && (
+            {allEpisodes.length > 1 && (
               <div className="xl:col-span-1">
                 <div className="bg-gray-800 rounded-xl p-6 sticky top-6">
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -161,11 +219,13 @@ const Episode = () => {
                     Episodes
                   </h2>
                   <div className="space-y-3 max-h-[70vh] overflow-y-auto scrollbar-hide">
-                    {prevFiles.map((episode, i) => (
+                    {allEpisodes.map((episode, i) => (
                       <button
-                        key={i}
-                        onClick={() => changeIndex(i)}
-                        className="w-full group relative overflow-hidden rounded-lg transition-transform hover:scale-105"
+                        key={episode._id}
+                        onClick={() => changeEpisode(episode)}
+                        className={`w-full group relative overflow-hidden rounded-lg transition-transform hover:scale-105 ${
+                          episode._id === episodeId ? 'ring-2 ring-orange-500' : ''
+                        }`}
                       >
                         <img
                           src={episode.snap_link}
@@ -174,22 +234,6 @@ const Episode = () => {
                         />
                         <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 flex items-center justify-center transition-colors">
                           <span className="text-white font-semibold">Episode {i + 1}</span>
-                        </div>
-                      </button>
-                    ))}
-                    {nxtFiles.map((episode, i) => (
-                      <button
-                        key={i + index + 1}
-                        onClick={() => changeIndex(i + index + 1)}
-                        className="w-full group relative overflow-hidden rounded-lg transition-transform hover:scale-105"
-                      >
-                        <img
-                          src={episode.snap_link}
-                          alt={`Episode ${i + index + 2}`}
-                          className="w-full aspect-video object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 flex items-center justify-center transition-colors">
-                          <span className="text-white font-semibold">Episode {i + index + 2}</span>
                         </div>
                       </button>
                     ))}

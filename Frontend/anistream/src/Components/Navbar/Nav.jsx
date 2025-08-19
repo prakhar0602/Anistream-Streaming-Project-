@@ -1,43 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import logo from "../../Assets/icon.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { setResults } from "../../Redux/local_data_Slice";
-import { logout } from "../../Redux/userSlice";
 const { VITE_BACKEND_LINK } = import.meta.env;
 const Nav = () => {
   const location = useLocation();
-  let dispatch = useDispatch();
   let navigate = useNavigate();
-  const user = useSelector((state) => state.user.user);
+  const [user, setUser] = useState(null);
   let [isLoggedIn, setLoggedIn] = useState(null);
   let [query, setQuery] = useState("");
   let [menuOpen, setMenuOpen] = useState(false);
+  let [profileDropdown, setProfileDropdown] = useState(false);
+  let [userProfile, setUserProfile] = useState(null);
   useEffect(() => {
-    async function ab() {
-      let response = await axios.get(`${VITE_BACKEND_LINK}/verify_token`, {
-        withCredentials: true,
-      });
-      response = response.data;
-      console.log(response);
-      setLoggedIn(response);
+    async function checkAuth() {
+      try {
+        const storedUser = localStorage.getItem('User');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          
+          let response = await axios.get(`${VITE_BACKEND_LINK}/verify_token`, {
+            withCredentials: true,
+          });
+          response = response.data;
+          setLoggedIn(response);
+          
+          if (response.bool) {
+            try {
+              const profileResponse = await axios.get(`${VITE_BACKEND_LINK}/user_profile`, {
+                withCredentials: true,
+              });
+              if (profileResponse.data.bool && profileResponse.data.user) {
+                setUserProfile(profileResponse.data.user);
+              }
+            } catch (error) {
+              console.error('Error fetching user profile:', error);
+            }
+          }
+        } else {
+          setLoggedIn({ bool: false });
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setLoggedIn({ bool: false });
+      }
     }
-    ab();
-  }, [user]);
+    checkAuth();
+  }, []);
 
   function changeURL(l) {
     navigate(l);
   }
   async function logout1() {
-    let response = await axios.get(`${VITE_BACKEND_LINK}/logout`, {
-      withCredentials: true,
-    });
-    response = response.data.bool;
-    if (response) {
-      setLoggedIn(null);
-      dispatch(logout());
+    try {
+      let response = await axios.get(`${VITE_BACKEND_LINK}/logout`, {
+        withCredentials: true,
+      });
+      response = response.data.bool;
+      if (response) {
+        localStorage.removeItem('User');
+        setLoggedIn({ bool: false });
+        setUser(null);
+        setUserProfile(null);
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   }
   async function search() {
@@ -46,17 +76,7 @@ const Nav = () => {
       return;
     }
     
-    try {
-      let results = await axios.get(`${VITE_BACKEND_LINK}/search/${encodeURIComponent(query.trim())}`);
-      if (results.data.bool) {
-        dispatch(setResults(results.data.results));
-        navigate("/results");
-      } else {
-        toast.warning(results.data.message || "No results found", { position: "bottom-right" });
-      }
-    } catch (error) {
-      toast.error("Search failed. Please try again.", { position: "bottom-right" });
-    }
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   }
   return (
     // <div className="bg-[#404040]/60 flex w-full items-center fixed top-0 h-[10vh] overflow-y-visible z-50 gap-8 px-2">
@@ -205,18 +225,72 @@ const Nav = () => {
           }
         </ul>
       </div>
-      <div className="text-2xl flex text-[#8f8f8f]">
+      <div className="text-2xl flex text-[#8f8f8f] relative">
         {isLoggedIn && isLoggedIn.bool ? (
-          <ul>
-            <li onClick={logout1}>
-              <div className="flex gap-5 hover:text-white">
-                <p className="  w-[100px] text-center">
-                  <ion-icon name="log-out"></ion-icon>
-                </p>
-                <p className={`  ${menuOpen?("ml-0 opacity-100"):("-ml-14 opacity-0")}  transition-margin transition-opacity duration-500 ease-in-out`}>Logout</p>
+          <div className="relative">
+            <div 
+              className="flex gap-5 hover:text-white cursor-pointer"
+              onClick={() => setProfileDropdown(!profileDropdown)}
+            >
+              <div className="w-[100px] flex justify-center">
+                {userProfile?.profile_image ? (
+                  <img 
+                    src={userProfile.profile_image} 
+                    alt="Profile" 
+                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-600 hover:border-white transition-colors"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className={`w-8 h-8 rounded-full border-2 border-gray-600 hover:border-white transition-colors bg-gray-600 flex items-center justify-center text-sm ${userProfile?.profile_image ? 'hidden' : 'flex'}`}>
+                  👤
+                </div>
               </div>
-            </li>
-          </ul>
+              <p className={`${menuOpen?("ml-0 opacity-100"):("-ml-14 opacity-0")} transition-margin transition-opacity duration-500 ease-in-out`}>
+                Profile
+              </p>
+            </div>
+            
+            {profileDropdown && (
+              <div className="absolute bottom-full left-20 mb-2 bg-[#1a1a1a] border border-gray-600 rounded-lg shadow-lg min-w-[200px] z-50">
+                <div className="p-3 border-b border-gray-600">
+                  <p className="text-white font-semibold">{userProfile?.username || 'User'}</p>
+                  <p className="text-gray-400 text-sm">{userProfile?.email}</p>
+                </div>
+                <ul className="py-2">
+                  <li>
+                    <button 
+                      onClick={() => {changeURL('/profile'); setProfileDropdown(false);}} 
+                      className="w-full text-left px-4 py-2 hover:bg-gray-700 text-gray-300 hover:text-white flex items-center gap-3"
+                    >
+                      <ion-icon name="person"></ion-icon>
+                      My Profile
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => {changeURL('/wishlist'); setProfileDropdown(false);}} 
+                      className="w-full text-left px-4 py-2 hover:bg-gray-700 text-gray-300 hover:text-white flex items-center gap-3"
+                    >
+                      <ion-icon name="bookmark"></ion-icon>
+                      Wishlist
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => {logout1(); setProfileDropdown(false);}} 
+                      className="w-full text-left px-4 py-2 hover:bg-red-600 text-gray-300 hover:text-white flex items-center gap-3"
+                    >
+                      <ion-icon name="log-out"></ion-icon>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         ) : (
           <ul className="flex flex-col gap-2">
             <li>
@@ -239,6 +313,12 @@ const Nav = () => {
         )}
       </div>
     </div>
+    {profileDropdown && (
+      <div 
+        className="fixed inset-0 z-30" 
+        onClick={() => setProfileDropdown(false)}
+      ></div>
+    )}
     </nav>
   );
 };

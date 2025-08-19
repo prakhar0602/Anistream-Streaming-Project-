@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Template from '../Components/Anime_list/Template/Template';
 
 const { VITE_BACKEND_LINK } = import.meta.env;
 
 const Search = () => {
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
   const [series, setSeries] = useState([]);
   const [movies, setMovies] = useState([]);
 
@@ -64,8 +66,15 @@ const Search = () => {
     }
   };
 
-  // Debounced search effect
+  // Handle URL query parameter and debounced search
   useEffect(() => {
+    const urlQuery = searchParams.get('q');
+    if (urlQuery && urlQuery !== query) {
+      setQuery(urlQuery);
+      performSearch(urlQuery);
+      return;
+    }
+    
     const timeoutId = setTimeout(() => {
       if (query.trim().length >= 1) {
         getSuggestions(query);
@@ -80,7 +89,7 @@ const Search = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -154,7 +163,7 @@ const Search = () => {
               <h2 className="text-2xl font-semibold mb-4 text-orange-400">Series</h2>
               <div className="flex flex-wrap gap-6">
                 {series.map((item) => (
-                  <Template series={item} key={item.fld_id} />
+                  <Template series={item} key={item._id} />
                 ))}
               </div>
             </div>
@@ -166,7 +175,7 @@ const Search = () => {
               <h2 className="text-2xl font-semibold mb-4 text-orange-400">Movies</h2>
               <div className="flex flex-wrap gap-6">
                 {movies.map((item) => (
-                  <Template series={item} key={item.fld_id} />
+                  <Template series={item} key={item._id} />
                 ))}
               </div>
             </div>

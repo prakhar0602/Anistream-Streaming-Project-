@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import logo from '../../../Assets/loading.gif'
-import { useSelector } from "react-redux";
+
 import { toast } from 'react-toastify';
 
 const {VITE_BACKEND_LINK}=import.meta.env
@@ -12,7 +12,7 @@ const Edit = () => {
   const [isLoading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('series');
   const [editingItem, setEditingItem] = useState(null);
-  const user = useSelector((state)=>state.user.user);
+  const user = JSON.parse(localStorage.getItem('User') || '{}');
   
   useEffect(() => {
     fetchData('series')
@@ -31,10 +31,10 @@ const Edit = () => {
       const response = await axios.get(`${VITE_BACKEND_LINK}${endpoint}`);
       
       if (type === 'series') {
-        setSeries(response.data);
+        setSeries(response.data.series || []);
         setMovies([]);
       } else {
-        setMovies(response.data);
+        setMovies(response.data.movies || []);
         setSeries([]);
       }
       setActiveTab(type);
@@ -49,7 +49,9 @@ const Edit = () => {
     if (window.confirm(`Are you sure you want to delete "${name}"? This will delete all related data.`)) {
       try {
         setLoading(true);
-        await axios.post(`${VITE_BACKEND_LINK}/delete_anime`, { type, id });
+        await axios.post(`${VITE_BACKEND_LINK}/delete_anime`, { type, id }, {
+          withCredentials: true
+        });
         
         if (type === 's') {
           setSeries(series.filter(item => item._id !== id));
@@ -78,14 +80,13 @@ const Edit = () => {
         desc: formData.desc,
         fld_id: formData.fld_id,
         nseasons: formData.nseasons,
-        nepisodes: formData.nepisodes,
         type: activeTab,
-        userID: user._id,
         genres: formData.genres || []
       };
       console.log('Sending payload:', payload)
       const response = await axios.post(`${VITE_BACKEND_LINK}/edit_anime`, payload,{
-        withCredentials:true
+        withCredentials: true,
+        timeout: 120000
       });
       console.log('Edit response:', response.data)
       
@@ -94,7 +95,11 @@ const Edit = () => {
       await fetchData(activeTab);
     } catch (error) {
       console.error('Edit error:', error);
-      toast.error('Failed to update anime');
+      if (error.code === 'ECONNRESET' || error.message.includes('timeout')) {
+        toast.info("Processing... Please check if anime was updated successfully");
+      } else {
+        toast.error('Failed to update anime');
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +114,6 @@ const Edit = () => {
       desc: item.desc,
       fld_id: item.fld_id,
       nseasons: item.nseasons,
-      nepisodes: item.nepisodes,
       genres: item.genres || []
     });
     
@@ -164,17 +168,10 @@ const Edit = () => {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Episodes"
-                  value={formData.nepisodes}
-                  onChange={(e) => setFormData({...formData, nepisodes: e.target.value})}
-                  className="p-3 rounded bg-gray-800 text-white border border-gray-600 flex-1"
-                />
-                <input
-                  type="text"
                   placeholder="Seasons"
                   value={formData.nseasons}
                   onChange={(e) => setFormData({...formData, nseasons: e.target.value})}
-                  className="p-3 rounded bg-gray-800 text-white border border-gray-600 flex-1"
+                  className="p-3 rounded bg-gray-800 text-white border border-gray-600"
                 />
               </div>
             </div>
@@ -288,7 +285,7 @@ const Edit = () => {
                   )}
                 </div>
                 <div className="text-sm text-gray-400 mb-3">
-                  <p>Episodes: {item.nepisodes} | Seasons: {item.nseasons}</p>
+                  <p>Seasons: {item.nseasons}</p>
                   <p>Rating: {item.avg_rating?.toFixed(1) || 'N/A'}</p>
                 </div>
                 <div className="flex gap-2">

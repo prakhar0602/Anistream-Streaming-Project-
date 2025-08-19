@@ -13,7 +13,7 @@ const Movies = () => {
     const fetchMovies = async () => {
       try {
         const response = await axios.get(`${VITE_BACKEND_LINK}/get_movies`);
-        setMovies(response.data);
+        setMovies(response.data.movies);
       } catch (error) {
         console.error('Failed to fetch movies:', error);
         setError('Failed to load movies. Please try again.');

@@ -29,6 +29,10 @@ const moviesSchema = mongoose.Schema({
     trim: true,
     index: true,
   },
+  seasons:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Seasons"
+  }],
   fld_id: {
     type: String,
     required: true,
@@ -47,25 +51,18 @@ const moviesSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Episodes" }],
+
   type: {
     type: String,
     required: true,
     trim: true,
   },
-  nepisodes: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+
+  
   nseasons: {
     type: String,
     required: true,
     trim: true,
-  },
-  expiryTime:{
-    type:Number,
-    required:true
   },
   uploadedBy:{
     type:mongoose.Schema.Types.ObjectId,

@@ -13,7 +13,7 @@ const Series = () => {
     const fetchSeries = async () => {
       try {
         const response = await axios.get(`${VITE_BACKEND_LINK}/get_series`);
-        setSeries(response.data);
+        setSeries(response.data.series);
       } catch (error) {
         console.error('Failed to fetch series:', error);
         setError('Failed to load series. Please try again.');
@@ -38,7 +38,7 @@ const Series = () => {
       <h1 className="text-3xl font-bold mb-8 text-orange-400">All Series ({series.length})</h1>
       
       {series.length > 0 ? (
-        <div className="flex flex-wrap gap-6">
+        <div className="grid grid-cols-4 gap-6">
           {series.map((item) => (
             <Template series={item} key={item._id} />
           ))}

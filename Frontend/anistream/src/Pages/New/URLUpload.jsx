@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FolderList from "../../Components/Anime_list/New/FolderList";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+const {VITE_BACKEND_LINK} = import.meta.env;
 
 const URLUpload = () => {
   const [fld_id, setFld_id] = useState("");
@@ -10,6 +12,12 @@ const URLUpload = () => {
   const [isUploaded, setUploaded] = useState(false);
   const [uploadStatus, setStatus] = useState([]);
   const [uploadError, setError] = useState([]);
+  const [selectedSeries, setSelectedSeries] = useState("");
+  const [selectedSeason, setSelectedSeason] = useState("");
+  const [seriesList, setSeriesList] = useState([]);
+  const [seasonsList, setSeasonsList] = useState([]);
+  const [episodeTitle, setEpisodeTitle] = useState("");
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     if (isUploaded) {
@@ -17,6 +25,34 @@ const URLUpload = () => {
       return () => clearInterval(interval);
     }
   }, [isUploaded]);
+
+  useEffect(() => {
+    fetchSeries();
+  }, []);
+
+  useEffect(() => {
+    if (selectedSeries) {
+      fetchSeasons();
+    }
+  }, [selectedSeries]);
+
+  async function fetchSeries() {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/get_series`);
+      setSeriesList(response.data.series || []);
+    } catch (error) {
+      console.error("Error fetching series:", error);
+    }
+  }
+
+  async function fetchSeasons() {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/series/${selectedSeries}/seasons`);
+      setSeasonsList(response.data.seasons || []);
+    } catch (error) {
+      console.error("Error fetching seasons:", error);
+    }
+  }
 
   async function chk_status(inte) {
     try {

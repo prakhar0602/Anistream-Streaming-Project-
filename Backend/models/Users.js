@@ -20,6 +20,10 @@ const userSchema=mongoose.Schema({
         required:true,
         trim:true
     },
+    profile_image:{
+        type:String,
+        default:'https://via.placeholder.com/150/cccccc/000000?text=User'
+    },
     wishlist:{type:mongoose.Schema.Types.ObjectId,ref:'wishlist'}
 })
 const user=mongoose.model('user',userSchema);

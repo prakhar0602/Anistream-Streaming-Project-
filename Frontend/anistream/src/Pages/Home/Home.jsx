@@ -3,21 +3,39 @@ import Main_Anime from '../../Components/Anime_list/Main_Anime/Main_Anime'
 import Template from '../../Components/Anime_list/Template/Template'
 import Template_2 from '../../Components/Anime_list/Template_2/Template_2'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { set_local_data1 } from '../../Redux/local_data_Slice'
-import { select } from '../../Redux/local_data_Slice'
 import Genre from '../../Components/Genre_Template/Genre'
 import axios from 'axios'
 const Home = () => {
   const {VITE_BACKEND_LINK}=import.meta.env
-  let dispatch=useDispatch();
-  let {series=[],movies=[],most_latest}=useSelector(state=>state.local)
+  const [series, setSeries] = useState([])
+  const [movies, setMovies] = useState([])
+  const [mostLatest, setMostLatest] = useState(null)
   const [recommendations, setRecommendations] = useState([])
   
   useEffect(()=>{
-    dispatch(set_local_data1())
+    fetchSeries()
+    fetchMovies()
     fetchRecommendations()
   },[])
+  
+  const fetchSeries = async () => {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/get_series`)
+      setSeries(response.data.series)
+      setMostLatest(response.data.series[response.data.series.length - 1])
+    } catch (error) {
+      console.log('Failed to fetch series:', error)
+    }
+  }
+  
+  const fetchMovies = async () => {
+    try {
+      const response = await axios.get(`${VITE_BACKEND_LINK}/get_movies`)
+      setMovies(response.data.movies)
+    } catch (error) {
+      console.log('Failed to fetch movies:', error)
+    }
+  }
   
   const fetchRecommendations = async () => {
     try {
@@ -35,19 +53,17 @@ const Home = () => {
     <div className='text-white pb-32'>
       <div>
       {
-        most_latest?(
-          <Main_Anime x={most_latest}/>
+        mostLatest?(
+          <Main_Anime x={mostLatest}/>
           ):(<p></p>)
         }
         {recommendations.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Recommended for You</p>
-            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
             {
               recommendations.map((s,index)=>(
-                <Link key={s._id} to="/view" onClick={()=>dispatch(select(s))}>
-                  <Template series={s}/>
-                </Link>
+                <Template key={s._id} series={s}/>
                 ))
               }
           </div>
@@ -57,10 +73,10 @@ const Home = () => {
         {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4 font-funky'>Trending</p>
-            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
             {
               series.map((s,index)=>(
-               <Template series={s} key={s.fld_id}/>
+                <Template key={s._id} series={s}/>
                 ))
               }
           </div>
@@ -69,10 +85,10 @@ const Home = () => {
         {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Animes</p>
-            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
             {
               [...series].sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)).map((s,index)=>(
-                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                <Template key={s._id} series={s}/>
                 ))
               }
           </div>
@@ -81,7 +97,7 @@ const Home = () => {
 
       <div className="lg:px-10 lg:py-7 p-5">
           <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Popular Genres</p>
-          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+          <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
           {
             ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy'].map((genre, index) => (
               <Link key={index} to={`/genres/${genre}`}>
@@ -104,10 +120,10 @@ const Home = () => {
         {series && series.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5">
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Series</p>
-            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
             {
               series.map((s,index)=>(
-                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                <Template key={s._id} series={s}/>
                 ))
               }
           </div>
@@ -116,10 +132,10 @@ const Home = () => {
         {movies && movies.length > 0 && (
           <div className="lg:px-10 lg:py-7 p-5"> 
             <p className='lg:text-3xl text-2xl lg:mb-7 mb-4'>Anime Movies</p>
-            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-auto'>
+            <div className='flex gap-3 max-w-full w-full h-fit no-scrollbar overflow-x-scroll overflow-y-hidden'>
             {
               movies.map((s,index)=>(
-                <Link to="/view" onClick={()=>dispatch(select(s))}><Template series={s} key={s.fld_id}/></Link>
+                <Template key={s._id} series={s}/>
                 ))
               }
           </div>

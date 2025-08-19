@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { login } from "../../Redux/userSlice";
 import logo1 from "../../Assets/loading....gif";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import Input from "../Input";
 const { VITE_BACKEND_LINK } = import.meta.env;
 
@@ -19,7 +17,6 @@ const Form = (props) => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,10 +31,13 @@ const Form = (props) => {
           }
         );
         response = response.data;
-        dispatch(login(response.users));
+        if (response.bool) {
+          localStorage.setItem('User', JSON.stringify(response.users));
+          navigate("/");
+        } else {
+          setMessage(response.msg);
+        }
         setLoading(false);
-        if (response.bool) navigate("/");
-        else setMessage(response.msg);
       } catch (e) {
         setLoading(false);
         setMessage("An Error Occured. Try Again");

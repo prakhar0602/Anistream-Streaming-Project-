@@ -32,6 +32,10 @@ const seriesSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  seasons:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Seasons"
+  }],
   rating: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Rating'
@@ -44,16 +48,7 @@ const seriesSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  episodes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Episodes'
-  }],
   type: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  nepisodes: {
     type: String,
     required: true,
     trim: true
@@ -62,10 +57,6 @@ const seriesSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
-  },
-  expiryTime:{
-    type:Number,
-    required:true
   },
   uploadedBy:{
     type:mongoose.Schema.Types.ObjectId,

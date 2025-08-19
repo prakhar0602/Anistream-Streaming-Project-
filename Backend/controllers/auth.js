@@ -267,6 +267,144 @@ const handleGetRecommendations = async(req,res) => {
     }
 }
 
+const handleGetUserStats = async(req,res) => {
+    try{
+        const totalUsers = await user.countDocuments();
+        const onlineUsers = await OnlineUsers.countDocuments();
+        
+        const {refreshToken} = req.cookies;
+        const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        const adminUser = await user.findById(userId).select('username');
+        
+        res.status(200).json({
+            bool: true,
+            totalUsers,
+            onlineUsers,
+            adminUser
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get user stats'});
+    }
+}
+
+const handleGetAnimeStats = async(req,res) => {
+    try{
+        const totalSeries = await Series.countDocuments();
+        const totalMovies = await Movies.countDocuments();
+        const totalAnimes = totalSeries + totalMovies;
+        
+        res.status(200).json({
+            bool: true,
+            totalAnimes,
+            totalSeries,
+            totalMovies
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get anime stats'});
+    }
+}
+
+const handleGetViewedAnalytics = async(req,res) => {
+    try{
+        const viewedData = await Viewed.find().populate('animeId');
+        
+        const analytics = viewedData.map(view => ({
+            animeId: view.animeId._id,
+            name: view.animeId.name,
+            cover_image: view.animeId.cover_image,
+            big_image: view.animeId.big_image,
+            avg_rating: view.animeId.avg_rating || 0,
+            viewerCount: view.userId.length,
+            type: view.animeModel.toLowerCase()
+        }));
+        
+        res.status(200).json({
+            bool: true,
+            analytics
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get viewed analytics'});
+    }
+}
+
+const handleGetOnlineUsers = async(req,res) => {
+    try{
+        const onlineUsers = await OnlineUsers.find();
+        const userDetails = [];
+        
+        for(const onlineUser of onlineUsers) {
+            const userInfo = await user.findOne({email: onlineUser.email}).select('username email type');
+            if(userInfo) {
+                userDetails.push({
+                    username: userInfo.username,
+                    email: userInfo.email,
+                    type: userInfo.type,
+                    loginTime: onlineUser.expireAt - (2*60*60*1000)
+                });
+            }
+        }
+        
+        res.status(200).json({
+            bool: true,
+            onlineUsers: userDetails
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get online users'});
+    }
+}
+
+const handleGetUserProfile = async(req,res) => {
+    try{
+        const {refreshToken} = req.cookies;
+        const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        
+        const userProfile = await user.findById(userId).select('username email type profile_image');
+        
+        if(userProfile) {
+            res.status(200).json({
+                bool: true,
+                user: userProfile
+            });
+        } else {
+            res.status(404).json({bool: false, msg: 'User not found'});
+        }
+    }
+    catch(e){
+        res.status(401).json({bool: false, msg: 'Authentication required'});
+    }
+}
+
+const handleEditProfile = async(req,res) => {
+    try{
+        const {refreshToken} = req.cookies;
+        const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        const {profile_image} = req.body;
+        
+        const updatedUser = await user.findByIdAndUpdate(
+            userId, 
+            {profile_image}, 
+            {new: true}
+        ).select('username email type profile_image');
+        
+        if(updatedUser) {
+            res.status(200).json({
+                bool: true,
+                user: updatedUser,
+                msg: 'Profile updated successfully'
+            });
+        } else {
+            res.status(404).json({bool: false, msg: 'User not found'});
+        }
+    }
+    catch(e){
+        res.status(401).json({bool: false, msg: 'Authentication required'});
+    }
+}
+
 module.exports = {
     handleAddUser,
     handleVerifyToken,
@@ -278,5 +416,11 @@ module.exports = {
     verifyCode,
     handleAddViewed,
     handleTraining,
-    handleGetRecommendations
+    handleGetRecommendations,
+    handleGetUserStats,
+    handleGetAnimeStats,
+    handleGetViewedAnalytics,
+    handleGetOnlineUsers,
+    handleGetUserProfile,
+    handleEditProfile
 }

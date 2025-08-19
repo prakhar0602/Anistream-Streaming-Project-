@@ -1,20 +1,23 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom';
-import { toast } from 'react-toastify'
 import axios from 'axios';
 const {VITE_BACKEND_LINK} = import.meta.env
 const ProtectedRoutes = ({children}) => {
-    let [redirect,setRedirect]=useState(true)
+    let [isAuthenticated, setIsAuthenticated] = useState(null)
     useEffect(()=>{
-        async function ab(){
-            let response=await axios.get(`${VITE_BACKEND_LINK}/verify_token`,{withCredentials:true})
-            response=response.data.bool
-            if(!response){
-           await setRedirect(false);}
+        async function checkAuth(){
+            try {
+                let response = await axios.get(`${VITE_BACKEND_LINK}/verify_token`, {withCredentials:true})
+                setIsAuthenticated(response.data.bool)
+            } catch (error) {
+                setIsAuthenticated(false)
+            }
         }
-        ab()
+        checkAuth()
     },[])
-    return redirect ? children : <Navigate to='/login' />
+    
+    if (isAuthenticated === null) return <div>Loading...</div>
+    return isAuthenticated ? children : <Navigate to='/login' />
 }
 
 export default ProtectedRoutes

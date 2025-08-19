@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Main.css";
-import { useDispatch} from "react-redux";
-import {select} from "../../../Redux/local_data_Slice";
-import { set_Episode } from "../../../Redux/episodeSlice";
+
 const Main_Anime = (props) => {
   let name = props.x.name;
-  let navigate = useNavigate();
-  let dispatch = useDispatch();
+  const navigate = useNavigate();
+
   let genres = props.x.genres;
   let desc = props.x.desc;
-  let files=props.x.episodes
+  let seasons = props.x.seasons || []
+  let totalEpisodes = seasons.reduce((total, season) => total + (season.episodes?.length || 0), 0)
   let rating = props.x.avg_rating;
   useEffect(() => {
   }, []);
@@ -18,20 +17,9 @@ const Main_Anime = (props) => {
  
   async function select_Episode(e) {
     e.preventDefault()
-    let a={
-      index:0,
-      files,
-    }
-    console.log(a)
-    dispatch(set_Episode(a));
-    navigate('/episode-view')
+    navigate(`/view/${props.x._id}`)
   }
-  async function setAnime(e){
-    e.preventDefault()
-    let x=props.x;
-    await dispatch(select(x))
-    navigate('/view')
-  }
+
   return (
     <div className="relative w-full h-[calc(100vw*0.5625)] lg:h-[calc(100vw*0.4625)] overflow-hidden">
       <img
@@ -64,14 +52,14 @@ const Main_Anime = (props) => {
               <span className="text-white font-semibold">{rating.toFixed(1)}</span>
             </div>
             <div className="w-1 h-1 bg-white/60 rounded-full"></div>
-            <span className="text-white/80">{files.length} Episodes</span>
+            <span className="text-white/80">{seasons.length} Season{seasons.length !== 1 ? 's' : ''}</span>
           </div>
           
           <p className="text-white/90 text-lg leading-relaxed mb-8 line-clamp-3">{desc}</p>
           
           <div className="flex flex-col sm:flex-row gap-4">
             <button
-              onClick={(e) => select_Episode(e, 0)}
+              onClick={select_Episode}
               className="group flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg shadow-red-600/25"
             >
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
@@ -79,16 +67,6 @@ const Main_Anime = (props) => {
               </div>
               Watch Now
             </button>
-            
-            <Link
-              onClick={(e)=>setAnime(e)}
-              className="group flex items-center justify-center gap-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 border border-white/30"
-            >
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                <ion-icon name="list" class="text-xl"></ion-icon>
-              </div>
-              All Episodes
-            </Link>
           </div>
         </div>
       </div>

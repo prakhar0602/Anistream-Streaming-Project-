@@ -4,6 +4,8 @@ const express=require('express')
 const app=express();
 const mongoose=require('mongoose');
 const cors=require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 const anime=require('./apis/anime')
 const auth=require('./apis/auth')
 const likes=require('./apis/likes_dislikes')
@@ -20,9 +22,9 @@ const Episodes = require('./models/Episode');
 const { default: axios } = require('axios');
 const PORT=process.env.PORT || 8080
 app.use(cors({ 
-    origin:['https://anistream-streaming-project-vaie.vercel.app',"https://anistream-streaming-project.vercel.app",'http://localhost:5173'],
+    origin:['https://anistream-streaming-project-vaie.vercel.app',"https://anistream-streaming-project.vercel.app",'http://localhost:5173','http://localhost:3001'],
    credentials:true,
-    methods:["GET","POST","PATCH","DELETE"],
+    methods:["GET","POST","PUT","PATCH","DELETE"],
     headers: ["Content-Type", "Authorization", "Origin", "Accept"]
  })); 
 // ab();
@@ -32,21 +34,50 @@ app.use(cookieParser())
 mongoose.connect(process.env.MONGO_LINK).then(()=>{
     console.log('Database connected');
 }).catch((error)=>{ 
-    console.log(error.message) 
-    console.log('Database connecting error....');
+    // Database connection error
 })
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Streaming API',
+      version: '1.0.0',
+      description: 'API documentation for streaming platform'
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Development server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'refreshToken',
+          description: 'Authentication cookie (set automatically on login)'
+        }
+      }
+    }
+  },
+  apis: ['./apis/*.js', './controllers/*.js']
+};
+
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 app.use(cookie());
-app.use(anime);    
+app.use( anime);    
 app.use(auth)   
-app.use(likes)
-app.use(reviews)  
+app.use( likes)
+app.use( reviews)  
 app.use(rating)
 
 
 
 
 let task1 = async()=>{
-    console.log('start')
     let expiryData = await expirySeries.find()
     expiryData = expiryData[0]
     let series = await Series.find();
@@ -66,13 +97,11 @@ let task1 = async()=>{
             }
     }
     await expiryData.save();
-    console.log('end')
 }
 // ab.seedViewed()
 
 let task2 = async()=>{
     let expiryData = await expirySeries.find().populate('series movies');
-    console.log("start");
     let series = expiryData[0].series;
     let movies = expiryData[0].movies;
     for (let i of series){
@@ -100,12 +129,11 @@ let task2 = async()=>{
     expiryData[0].series=[];
     expiryData[0].movies=[];
     await expiryData[0].save();
-    console.log("end")
 }
 
 let sendTrainingData = async() => {
     try {
-        console.log('Starting training data collection...');
+
         
         const viewingData = await ViewingHistory.find({
             viewedAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
@@ -147,12 +175,12 @@ let sendTrainingData = async() => {
                 formattedData,
                 { headers: { 'Content-Type': 'application/json' } }
             );
-            console.log('Training data sent successfully:', response.data);
+
         } else {
-            console.log('No new viewing data to send');
+
         }
     } catch (error) {
-        console.error('Error sending training data:', error.message);
+
     }
 };
 
@@ -165,22 +193,18 @@ await expirySeries.create({series:[],movies:[]})
 }
 // abx()
 const server = app.listen(PORT,()=>{
-    console.log("Server is started at",PORT);
+    console.log('Server started at port', PORT);
 })
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
     server.close(() => {
-        console.log('Process terminated');
         process.exit(0);
     });
 });
 
 process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
     server.close(() => {
-        console.log('Process terminated');
         process.exit(0);
     });
 }); 

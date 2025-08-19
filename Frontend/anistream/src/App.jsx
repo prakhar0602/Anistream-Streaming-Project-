@@ -7,6 +7,7 @@ import Episode from './Pages/Episode/Episode'
 import Signup from './Pages/Auth/Signup'
 import Home from './Pages/Home/Home'
 import Genres from './Pages/Genres/Genres'
+import Profile from './Pages/Profile/Profile'
 import {Provider} from 'react-redux'
 
 import Login from './Pages/Auth/Login'
@@ -50,9 +51,10 @@ function App() {
         <Route path="/upload" element={<ProtectedRoutes><New/></ProtectedRoutes>} />
         <Route path="/upload/:type" element={<ProtectedRoutes><Upload/></ProtectedRoutes>} />
         <Route path="/edit" element={<ProtectedRoutes><Edit/></ProtectedRoutes>} />
-        <Route path="/view" element={<ProtectedRoutes><View/></ProtectedRoutes>} />
-        <Route path="/episode-view" element={<ProtectedRoutes><Episode/></ProtectedRoutes>} />
+        <Route path="/view/:id" element={<ProtectedRoutes><View/></ProtectedRoutes>} />
+        <Route path="/episode-view/:animeId/:episodeId" element={<ProtectedRoutes><Episode/></ProtectedRoutes>} />
         <Route path="/wishlist" element={<ProtectedRoutes><Wishlist/></ProtectedRoutes>} />
+        <Route path="/profile" element={<ProtectedRoutes><Profile/></ProtectedRoutes>} />
         <Route path="/results" element={<Results/>} />
         <Route path="/search" element={<Search/>} />
         <Route path="/series" element={<Series/>} />

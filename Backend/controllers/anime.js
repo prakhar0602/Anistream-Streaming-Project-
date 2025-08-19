@@ -11,13 +11,13 @@ const {
   findAnime,
   getGenres,
   getAnimeByGenre,
+  getAnimeById,
 } = require("../functions/anime_operations");
 const { default: axios } = require("axios");
 const jwt = require('jsonwebtoken');
 
 const handleFetchSeries = async (req, res) => {
   let x = await getSeries();
-  console.log(x)
   res.status(200).json(x);
 };
 
@@ -46,11 +46,7 @@ const handleEditAnime = async (req, res) => {
     id,genres
   } = req.body;
   try {
-    // console.log(req.body)
-  // Parse genres if it's a JSON string
   const parsedGenres = typeof genres === 'string' ? JSON.parse(genres || '[]') : (genres || []);
-  // console.log(parsedGenres)
-  // console.log('Edit request - genres:', genres, 'parsed:', parsedGenres);
   const {refreshToken} = req.cookies;
   const {id: userId} = jwt.verify(refreshToken, 'Prakhar_Gupta');
   
@@ -67,7 +63,7 @@ const handleEditAnime = async (req, res) => {
   );
     res.status(200).json({ data: "Data updated" });
   } catch (error) {
-    console.error('Edit error:', error);
+
     res.status(500).json({ error: error.message });
   }
 };
@@ -81,12 +77,14 @@ const handleAddAnime = async (req, res) => {
     desc,
     fld_id,
     type,
+    seasons,
     nseasons,
     nepisodes,userID,genres
   } = req.body;
   
-  // Parse genres if it's a JSON string
+  // Parse genres and seasons if they're JSON strings
   const parsedGenres = typeof genres === 'string' ? JSON.parse(genres || '[]') : (genres || []);
+  const parsedSeasons = typeof seasons === 'string' ? JSON.parse(seasons || '[]') : (seasons || []);
   await addAnime(
     name,
     cover_image,
@@ -95,8 +93,10 @@ const handleAddAnime = async (req, res) => {
     desc,
     fld_id,
     type,
+    parsedSeasons,
     nseasons,
-    nepisodes,userID,parsedGenres
+    userID,
+    parsedGenres
   );
   res.status(201).json({ bool:true,data: "Data added" });
 };
@@ -107,7 +107,7 @@ const handleFetchFileCode = async (req, res) => {
     let x = await fetchFileCode(id);
     res.status(200).json(x);
   } catch (e) {
-    console.log(e.message);
+
   }
 };
 
@@ -122,7 +122,7 @@ const handleFetchFoldersById = async(req,res)=>{
     
     // Check if response contains expected data structure
     if (!response.data || !response.data.result || !response.data.result.folders) {
-      console.log('Invalid API response:', response.data);
+
       return res.status(500).json({error:"Invalid API response - possibly blocked by firewall"});
     }
     
@@ -133,7 +133,7 @@ const handleFetchFoldersById = async(req,res)=>{
     })
     res.status(200).json({folders:selectedFolders,msg:"Folders found"});
   } catch(e){
-    console.log('API request failed:', e.message);
+
     res.status(500).json({error:"Failed to fetch folders - network or firewall issue"});
   }
 }
@@ -167,7 +167,7 @@ const handleSearchQuery = async (req, res) => {
       message: `Found ${results.series.length} series and ${results.movies.length} movies`
     });
   } catch (error) {
-    console.error('Search error:', error);
+
     res.status(500).json({ 
       bool: false, 
       message: 'Search failed. Please try again.',
@@ -207,6 +207,19 @@ const handleFetchAnimeByGenre = async (req, res) => {
   }
 };
 
+const handleFetchAnimeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const anime = await getAnimeById(id);
+    if (!anime) {
+      return res.status(404).json({ error: 'Anime not found' });
+    }
+    res.status(200).json(anime);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch anime' });
+  }
+};
+
 module.exports = {
   handleFetchSeries,
   handleFetchMovies,
@@ -219,5 +232,6 @@ module.exports = {
   handleExpiryNotification,
   handleFetchFoldersById,
   handleFetchGenres,
-  handleFetchAnimeByGenre
+  handleFetchAnimeByGenre,
+  handleFetchAnimeById
 };

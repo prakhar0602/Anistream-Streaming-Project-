@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { check_user } from '../../Redux/userSlice'
 import { useNavigate, useParams } from 'react-router-dom'
 import Genre from '../../Components/Genre_Template/Genre'
 import Template from '../../Components/Anime_list/Template/Template'
@@ -15,9 +14,11 @@ const Genres = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    async function checkAuth() {
-      if (!await check_user())
+    const checkAuth = () => {
+      const user = localStorage.getItem('User')
+      if (!user) {
         navigate('/login')
+      }
     }
     checkAuth()
   }, [])

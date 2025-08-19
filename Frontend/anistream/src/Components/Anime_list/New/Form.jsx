@@ -11,11 +11,10 @@ const Form = () => {
   const [cover_image, setCoverImage] = useState("");
   const [cover_image2, setCoverImage2] = useState("");
   const [desc, setDesc] = useState("");
-  const [nepisodes, setEpisodes] = useState("");
-  const [nseasons, setSeasons] = useState("");
   const [type, setType] = useState("");
   const [fld_id, setFld_id] = useState("");  // Folder ID
   const [genres, setGenres] = useState([]);
+  const [seasonNames, setSeasonNames] = useState([""]);
   const user = useSelector((state) => state.user.user);
 
   const genreOptions = [
@@ -38,8 +37,7 @@ const Form = () => {
     formData.append("cover_image", cover_image);
     formData.append("cover_image2", cover_image2);
     formData.append("desc", desc);
-    formData.append("nseasons", nseasons);
-    formData.append("nepisodes", nepisodes);
+    formData.append("seasons", JSON.stringify(seasonNames.filter(name => name.trim())));
     formData.append("fld_id", fld_id);
     formData.append("type", type);
     formData.append("userID",user._id);
@@ -48,6 +46,7 @@ const Form = () => {
     try {
       let response = await axios.post(`${VITE_BACKEND_LINK}/add_anime`, new URLSearchParams(formData).toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        timeout: 120000, // 2 minutes timeout
       });
       // console.log(response)
       response=response.data.data
@@ -58,7 +57,11 @@ const Form = () => {
       else
         toast.error("Anime not added");
     } catch (error) {
-      toast.error("Anime not added");
+      if (error.code === 'ECONNRESET' || error.message.includes('timeout')) {
+        toast.info("Processing... Please check if anime was added successfully");
+      } else {
+        toast.error("Anime not added");
+      }
       console.log(error);
     }
   }
@@ -110,16 +113,37 @@ const Form = () => {
                   className="outline-none p-[10px] ml-[10px] border-[1.5px] border-white text-[25px] rounded-[10px]" />
               </div>
 
-              <div className="flex w-full justify-between items-center">
-                <label className="text-white font-mono text-[18px]" htmlFor="nepisodes">Episodes</label>
-                <input type="text" id="nepisodes" value={nepisodes} onChange={(e) => setEpisodes(e.target.value)}
-                  className="outline-none p-[10px] ml-[10px] border-[1.5px] border-white text-[25px] rounded-[10px]" />
-              </div>
-
-              <div className="flex w-full justify-between items-center">
-                <label className="text-white font-mono text-[18px]" htmlFor="nseasons">Seasons</label>
-                <input type="text" id="nseasons" value={nseasons} onChange={(e) => setSeasons(e.target.value)}
-                  className="outline-none p-[10px] ml-[10px] border-[1.5px] border-white text-[25px] rounded-[10px]" />
+              <div className="flex flex-col gap-3">
+                <label className="text-white font-mono text-[18px]">Season Names</label>
+                {seasonNames.map((name, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => {
+                        const updated = [...seasonNames];
+                        updated[index] = e.target.value;
+                        setSeasonNames(updated);
+                      }}
+                      className="outline-none p-[10px] border-[1.5px] border-white text-[20px] rounded-[10px] flex-1"
+                      placeholder={`Season ${index + 1} name`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSeasonNames(seasonNames.filter((_, i) => i !== index))}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setSeasonNames([...seasonNames, ""])}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-fit"
+                >
+                  + Add Season
+                </button>
               </div>
 
               <div className="flex w-full justify-between items-center">

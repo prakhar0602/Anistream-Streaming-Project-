@@ -2,24 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Main.css";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  set_local_data1,
-  update_selected,
-} from "../../../Redux/local_data_Slice";
-import { set_Episode } from "../../../Redux/episodeSlice";
+
 const { VITE_BACKEND_LINK } = import.meta.env;
 const Main_Anime_2 = (props) => {
   let name = props.x.name;
-  let dispatch = useDispatch();
   let genres =props.x.genres;
   let desc = props.x.desc;
   let files = props.x.episodes;
   let rating = props.x.avg_rating;
+  const [currentRating, setCurrentRating] = useState(rating || 0);
   let [wishList, setWishList] = useState(false);
   let [rate, setRate] = useState(null);
+  let [selectedRating, setSelectedRating] = useState(0);
+  let [hoverRating, setHoverRating] = useState(0);
+  let [showFullDescription, setShowFullDescription] = useState(false);
   let navigate = useNavigate();
   useEffect(() => {
+    setCurrentRating(props.x.avg_rating || 0);
     async function ab() {
       let id2 = JSON.parse(localStorage.getItem("User"))._id;
       let rates = props.x.rating;
@@ -27,7 +26,6 @@ const Main_Anime_2 = (props) => {
         id: id2,
       });
       response = response.data;
-      // console.log(response)
       if (props.x.type == "s") {
         response = response.series;
       } else {
@@ -42,52 +40,55 @@ const Main_Anime_2 = (props) => {
       response = response.data;
       if (props.x.type == "s") response = response.series;
       else response = response.movies;
-      console.log(props.x._id);
-      console.log(response);
       if (response.some((k) => k._id == props.x._id)) setWishList(true);
     }
     ab();
-  }, []);
+  }, [props.x.avg_rating]);
+
+  
   async function clearRating(e) {
     e.preventDefault();
-    console.log(props.x.rating);
-    let id2 = JSON.parse(localStorage.getItem("User"))._id;
-    let rates = props.x.rating;
-    let zz = rates.find((e) => e.user == id2);
-    let type = props.x.type;
-    let id3 = zz._id;
-    let rid = props.x._id;
-    let response = await axios.get(
-      `${VITE_BACKEND_LINK}/del_rating/${id3}/${rid}/${type}`
-    );
-    await dispatch(update_selected({ id: rid, type }));
-    setRate(null);
-    await dispatch(set_local_data1());
+    try {
+      let type = props.x.type;
+      let rid = props.x._id;
+      
+      const response = await axios.delete(`${VITE_BACKEND_LINK}/clear_rating/${rid}/${type}`, {
+        withCredentials: true
+      });
+      
+      const updatedAnime = await axios.get(`${VITE_BACKEND_LINK}/anime/${props.x._id}`);
+      setCurrentRating(updatedAnime.data.avg_rating || 0);
+      setRate(null);
+      
+      window.location.reload();
+    } catch (error) {
+      console.error('Error clearing rating:', error);
+    }
   }
   async function handleSubmit(e) {
     e.preventDefault();
-    let uid = JSON.parse(localStorage.getItem("User"))._id;
-    let r = props.x.rating;
-    let check = r.some((x) => x["user"] == uid);
-    if (!check) {
+    try {
       let rating = e.target.rating.value;
       if (rating != 0) {
         let id = props.x._id;
         let type = props.x.type;
+        
         await axios.post(`${VITE_BACKEND_LINK}/add_series_rating`, {
           rating,
           type,
-          uid,
           id,
+        }, {
+          withCredentials: true
         });
-        await dispatch(update_selected({ id, type }));
-        setRate(rating);
-        await dispatch(set_local_data1());
+        
+        const updatedAnime = await axios.get(`${VITE_BACKEND_LINK}/anime/${props.x._id}`);
+        setCurrentRating(updatedAnime.data.avg_rating || 0);
+        setRate(parseInt(rating));
       } else {
         alert("Please select rating");
       }
-    } else {
-      alert("rating already given");
+    } catch (error) {
+      console.error('Error submitting rating:', error);
     }
   }
   async function toggleWishlist() {
@@ -102,170 +103,159 @@ const Main_Anime_2 = (props) => {
   }
   async function select_Episode(e) {
     e.preventDefault();
-    let a = {
-      index: 0,
-      files,
-    };
-    console.log(a);
-    dispatch(set_Episode(a));
-    navigate("/episode-view");
+    if (props.x.seasons && props.x.seasons.length > 0 && props.x.seasons[0].episodes && props.x.seasons[0].episodes.length > 0) {
+      const firstEpisode = props.x.seasons[0].episodes[0];
+      navigate(`/episode-view/${props.x._id}/${firstEpisode._id}`);
+    }
   }
   return (
-    <div>
+    <div className="relative overflow-hidden">
       <img
         src={props.x.big_image}
-        className="h-[calc(100vw*0.6625)] lg:h-[calc(100vw*0.4625)]  z-0 w-screen"
+        className="h-[calc(100vw*0.6625)] lg:h-[calc(100vw*0.4625)] w-screen object-cover"
         alt=""
       />
-      <div className="h-[calc(100vw*0.6625)] lg:h-[calc(100vw*0.4625)] bg-black/60 relative lg:-mt-[calc(100vw*0.4625)] -mt-[calc(100vw*0.6625)] z-10"></div>
-      <div className="flex flex-col px-10 text-white relative h-[calc(100vw*0.6625)] lg:h-[calc(100vw*0.4625)] -mt-[calc(100vw*0.6625)] lg:-mt-[calc(100vw*0.4625)] justify-center lg:gap-4 z-20">
-        <h2 className="xl:text-6xl text-3xl font-bold font-mono">{name}</h2>
-        <div className="flex lg:gap-3 gap-3 lg:my-5 mt-1 lg:mt-0">
-          {genres.map((g, index) => (
-            <div className="flex genre gap-3">
-              <p>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+      <div className="absolute inset-0 flex flex-col justify-end px-6 lg:px-12 pb-8 lg:pb-16 text-white">
+        <div className="max-w-4xl">
+          <h1 className="text-4xl lg:text-6xl xl:text-7xl font-bold mb-4 drop-shadow-2xl">
+            {name}
+          </h1>
+          
+          <div className="flex flex-wrap gap-2 lg:gap-3 mb-6">
+            {genres.map((g, index) => (
+              <span 
+                key={index}
+                className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm lg:text-base border border-white/30 hover:scale-105 transition-transform duration-300"
+              >
                 {g}
-                </p>
-                {
-                  genres.length-1==index?(
-                    <div></div>
-                  ):(
-                  <div className="w-[1px] bg-[#ffffff] h-full"></div>
-                )}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-8 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={`text-xl ${i < Math.floor(currentRating) ? 'text-yellow-400' : 'text-gray-400/50'}`}>
+                    ⭐
+                  </span>
+                ))}
               </div>
+              <span className="text-2xl font-bold text-white">
+                {currentRating.toFixed(1)}
+              </span>
+              <span className="text-lg text-white/80">Average Rating</span>
+            </div>
             
-          ))}
-        </div>
-        <div className="flex items-center gap-8">
-          <p className="  lg:text-xl text-lg mt-1 lg:mt-0 p-0 mb-0">
-            {rating.toFixed(1)} Average Rating{" "}
-          </p>
-          <div className="w-[1px] bg-[#ffffff] h-full"></div>
-          <div className="lg:inline hidden h-fit">
-            {rate ? (
-              <div className="flex items-center gap-8">
-                <p class="starability-result" data-rating={rate}>
-                  Rated: {rate} stars
-                </p>
-                <button
-                  className="p-2 rounded-lg bg-gradient-to-r from-[#5b2020] hover:from-[#230000] hover:to-[#230000] to-[#230000] "
-                  onClick={(e) => clearRating(e)}
-                >
-                  Clear Rating
-                </button>
-              </div>
-            ) : (
-              <div className="">
+            <div className="lg:flex hidden items-center gap-6">
+              {rate ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/90">Your Rating:</span>
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={`text-lg ${i < rate ? 'text-blue-400' : 'text-gray-400/50'}`}>
+                          ⭐
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    className="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white font-medium transition-all duration-300"
+                    onClick={(e) => clearRating(e)}
+                  >
+                    Clear Rating
+                  </button>
+                </>
+              ) : (
                 <form
-                  className="flex gap-14 justify-left items-center"
+                  className="flex items-center gap-4"
                   onSubmit={(e) => handleSubmit(e)}
                 >
-                  <fieldset className="flex starability-basic ">
-                    <input
-                      type="radio"
-                      id="no-rate"
-                      class="input-no-rate"
-                      name="rating"
-                      value={0}
-                      defaultChecked
-                      aria-label="No rating."
-                    />
-                    <input
-                      type="radio"
-                      id="second-rate1"
-                      name="rating"
-                      value={1}
-                    />
-                    <label for="second-rate1" title="Terrible">
-                      1 star
-                    </label>
-                    <input
-                      type="radio"
-                      id="second-rate2"
-                      name="rating"
-                      value={2}
-                    />
-                    <label for="second-rate2" title="Not good">
-                      2 stars
-                    </label>
-                    <input
-                      type="radio"
-                      id="second-rate3"
-                      name="rating"
-                      value={3}
-                    />
-                    <label for="second-rate3" title="Average">
-                      3 stars
-                    </label>
-                    <input
-                      type="radio"
-                      id="second-rate4"
-                      name="rating"
-                      value={4}
-                    />
-                    <label for="second-rate4" title="Very good">
-                      4 stars
-                    </label>
-                    <input
-                      type="radio"
-                      id="second-rate5"
-                      name="rating"
-                      value={5}
-                    />
-                    <label for="second-rate5" title="Amazing">
-                      5 stars
-                    </label>
-                  </fieldset>
-
-                  <button className="bg-[#fff] text-black p-2 rounded-lg">
-                    Submit Rating
+                  <span className="text-white/90">Rate:</span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <label key={star} className="cursor-pointer">
+                        <input 
+                          type="radio" 
+                          name="rating" 
+                          value={star} 
+                          className="hidden"
+                          onChange={() => setSelectedRating(star)}
+                        />
+                        <span 
+                          className={`text-2xl transition-colors duration-200 ${
+                            star <= (hoverRating || selectedRating) 
+                              ? 'text-yellow-400' 
+                              : 'text-gray-400/50'
+                          }`}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                        >
+                          ⭐
+                        </span>
+                      </label>
+                    ))}
+                    <input type="radio" name="rating" value={0} defaultChecked className="hidden" />
+                  </div>
+                  <button className="px-4 py-2 bg-white/90 text-black rounded-lg hover:bg-white transition-all duration-300 font-medium">
+                    Submit
                   </button>
                 </form>
-              </div>
+              )}
+            </div>
+          </div>
+
+          <div className="text-base lg:text-lg opacity-90 mb-8 max-w-3xl leading-relaxed hidden lg:block">
+            <div className={`${showFullDescription ? 'max-h-32 overflow-y-auto custom-scrollbar' : ''} transition-all duration-300`}>
+              <p className={`${showFullDescription ? '' : 'line-clamp-2'}`}>
+                {desc}
+              </p>
+            </div>
+            {desc && desc.length > 150 && (
+              <button 
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="text-blue-400 hover:text-blue-300 mt-2 font-medium transition-colors duration-200"
+              >
+                {showFullDescription ? 'Read Less' : 'Read More'}
+              </button>
             )}
           </div>
-        </div>
-        <p className={`lg:block hidden`}>{desc}</p>
 
-        <div className="flex justify-left mt-3 lg:mt-0">
-          <Link
-            className=" text-black h-12 flex justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl bg-[#fff]"
-            onClick={(e) => select_Episode(e)}
-          >
-            Watch Episode 1
-          </Link>
-          {wishList ? (
+          <div className="flex flex-wrap gap-4">
             <Link
-              className=" text-black flex h-12 justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl  bg-[#fff]"
-              onClick={() => toggleWishlist()}
+              className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={(e) => select_Episode(e)}
             >
-              <span
-                className={
-                  "lg:text-2xl h-fit text-xl m-0 flex items-center text-[#fff]"
-                }
-              >
-                <ion-icon className="h-fit" name="bookmark"></ion-icon>
-              </span>
-              <span className="text-lg inline">Remove from WatchList</span>
+              <span className="text-xl">▶</span>
+              <span>Watch Episode 1</span>
             </Link>
-          ) : (
-            <Link
-              className=" text-[#fff] flex justify-center items-center gap-2 mr-2 ml-3 py-2.5 px-4 rounded-3xl  border-[3px] border-[#fff]"
-              onClick={() => toggleWishlist()}
-            >
-              <span
-                className={
-                  "lg:text-2xl text-xl m-0 h-fit flex items-center text-[#fff]"
-                }
+            
+            {wishList ? (
+              <Link
+                className="flex items-center gap-3 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-full font-semibold transition-all duration-300 border border-white/30"
+                onClick={() => toggleWishlist()}
               >
-                <ion-icon name="add-circle-outline"></ion-icon>
-              </span>
-              <span className="hidden text-lg lg:inline">Add to WatchList</span>
-              <span className="flex lg:hidden m-0 items-center h-fit">
-                WatchList
-              </span>
-            </Link>
-          )}
+                <span className="text-xl text-black">
+                  <ion-icon name="bookmark"></ion-icon>
+                </span>
+                <span className="hidden lg:inline">Remove from Watchlist</span>
+                <span className="lg:hidden">Remove</span>
+              </Link>
+            ) : (
+              <Link
+                className="flex items-center gap-3 px-6 py-3 bg-transparent hover:bg-white/10 backdrop-blur-sm text-white rounded-full font-semibold transition-all duration-300 border-2 border-white/50 hover:border-white"
+                onClick={() => toggleWishlist()}
+              >
+                <span className="text-xl">
+                  <ion-icon name="add-circle-outline"></ion-icon>
+                </span>
+                <span className="hidden lg:inline">Add to Watchlist</span>
+                <span className="lg:hidden">Add</span>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

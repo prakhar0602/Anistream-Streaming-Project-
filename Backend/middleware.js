@@ -75,6 +75,20 @@ const validateEditUser = async(req,res,next) => {
     }
 }
 
+const validateAdmin = async(req,res,next) => {
+    try{
+        const {refreshToken} = req.cookies;
+        const {type} = jwt.verify(refreshToken, 'Prakhar_Gupta');
+        if(type === 'admin'){
+            return next();
+        }
+        return res.status(403).json({bool:false,msg:"Admin access required"});
+    }
+    catch(e){
+        res.status(401).json({bool:false,msg:"Authentication failed"});
+    }
+}
+
 const validateSignup = (req,res,next) => {
     let {username,email,password,repeat_password} = req.body;
     const {error} = signupSchema.validate({username,email,password,repeat_password});
@@ -87,4 +101,4 @@ const validateSignup = (req,res,next) => {
     }
 }
  
-module.exports = {refreshToken,validateAnime,validateLogin,validateSignup,validateEditUser} 
+module.exports = {refreshToken,validateAnime,validateLogin,validateSignup,validateEditUser,validateAdmin} 
