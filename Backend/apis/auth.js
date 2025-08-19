@@ -41,6 +41,7 @@ const  {
     handleGetAnimeStats,
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
+    handleGetAllUsers,
     handleGetUserProfile,
     handleEditProfile,
     handleDownloadCSV
@@ -413,6 +414,33 @@ router.get('/user_profile', refreshToken, handleGetUserProfile)
  *         description: Authentication required
  */
 router.put('/edit_profile', refreshToken, handleEditProfile)
+
+/**
+ * @swagger
+ * /all_users:
+ *   get:
+ *     summary: Get all users (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: All users retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 bool:
+ *                   type: boolean
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/all_users', refreshToken, validateAdmin, handleGetAllUsers)
 
 /**
  * @swagger

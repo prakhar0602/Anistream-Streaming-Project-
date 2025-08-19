@@ -62,18 +62,21 @@ const handleLogin = async (req, res) => {
                         expiresIn:'2h'
                     });
                     await OnlineUsers.create({email,token:refreshToken,expiryTime:Date.now()+1000*60*60*2,expireAt:Date.now()+(2*60*60*1000)});
-                    res.cookie('accessToken',token,{
-                        httpOnly:true,
-                        secure:true,
-                        sameSite:'None',
-                        maxAge:1000*60*5
-                    })
-                    res.cookie('refreshToken',refreshToken,{
-                        httpOnly:true,
-                        secure:true,
-                        sameSite:'None',
-                        maxAge:1000*60*60*2
-                    })
+                    const cookieOptions = {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+                        domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+                    };
+                    
+                    res.cookie('accessToken', token, {
+                        ...cookieOptions,
+                        maxAge: 1000*60*5
+                    });
+                    res.cookie('refreshToken', refreshToken, {
+                        ...cookieOptions,
+                        maxAge: 1000*60*60*2
+                    });
                     res.status(200).json({users,bool:true,msg:"Login Successfull"});
                 }
                 else 
@@ -138,14 +141,23 @@ const handleToggleWishlist =  async(req,res)=>{
 
 const handleLogout = async(req,res)=>{
     try{
-        res.clearCookie('accessToken')
-        res.clearCookie('refreshToken');
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+        };
+        
+        res.clearCookie('accessToken', cookieOptions);
+        res.clearCookie('refreshToken', cookieOptions);
+        
         let {email} = jwt.verify(req.cookies.refreshToken,"Prakhar_Gupta")
         await OnlineUsers.deleteOne({email}); 
-        res.status(200).json({bool:true,msg:'logout'})}
-        catch(e){
-            res.status(200).json({bool:false,msg:'logout failed'})
-        }
+        res.status(200).json({bool:true,msg:'logout'});
+    }
+    catch(e){
+        res.status(200).json({bool:false,msg:'logout failed'})
+    }
 }
 
 const sendCode = async(req,res)=>{
@@ -396,6 +408,20 @@ const handleGetUserProfile = async(req,res) => {
     }
 }
 
+const handleGetAllUsers = async(req,res) => {
+    try{
+        const allUsers = await user.find().select('username email type profile_image');
+        
+        res.status(200).json({
+            bool: true,
+            users: allUsers
+        });
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to get users'});
+    }
+}
+
 const handleEditProfile = async(req,res) => {
     try{
         const {refreshToken} = req.cookies;
@@ -439,6 +465,7 @@ module.exports = {
     handleGetAnimeStats,
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
+    handleGetAllUsers,
     handleGetUserProfile,
     handleEditProfile,
     handleDownloadCSV

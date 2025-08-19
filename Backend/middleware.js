@@ -17,12 +17,14 @@ const refreshToken = async (req,res,next)=>{
             if(token==undefined && Date.now()<=current.expiryTime){
                 let {email} = jwt.verify(refreshToken,'Prakhar_Gupta');
                 token=jwt.sign(email,'Prakhar_Gupta');
-                res.cookie('accessToken',token,{
-                    httpOnly:true,
-                    secure:true,
-                    sameSite:'strict',
-                    maxAge:1000*60*5
-                })
+                const cookieOptions = {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+                    domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost',
+                    maxAge: 1000*60*5
+                };
+                res.cookie('accessToken', token, cookieOptions);
                 break;
             }
         }

@@ -4,6 +4,7 @@ import Users from './pages/Users'
 import Login from './pages/Login'
 import Recommendations from './pages/Recommendations'
 import Creators from './pages/Creators'
+import AllUsers from './pages/AllUsers'
 import './App.css'
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/recommendations" element={<Recommendations />} />
           <Route path="/creators" element={<Creators />} />
+          <Route path="/all-users" element={<AllUsers />} />
         </Routes>
       </div>
     </Router>

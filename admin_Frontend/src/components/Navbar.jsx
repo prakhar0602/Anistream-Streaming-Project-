@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Brain, ArrowDownToLine, UserPlus, Settings } from "lucide-react";
+import { Home, Users, Brain, Eye, UserPlus, Settings } from "lucide-react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ export default function Sidebar() {
           </div>
           <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/users')}>
             <Users size={20} className="text-white"/>
-            <span className="text-white">Users</span>
+            <span className="text-white">Online Users</span>
           </div>
           <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/recommendations') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/recommendations')}>
             <Brain size={20} className="text-white"/>
@@ -63,9 +63,9 @@ export default function Sidebar() {
             <UserPlus size={20} className="text-white"/>
             <span className="text-white">Content Creators</span>
           </div>
-          <div className="flex items-center space-x-3 p-3 rounded-lg opacity-70">
-            <ArrowDownToLine size={20} className="text-white"/>
-            <span className="text-white">Transactions</span>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/all-users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/all-users')}>
+            <Eye size={20} className="text-white"/>
+            <span className="text-white">Users</span>
           </div>
           <div className="flex items-center space-x-3 p-3 rounded-lg opacity-70">
             <Settings size={20} className="text-white"/>
