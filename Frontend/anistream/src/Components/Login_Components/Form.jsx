@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import logo1 from "../../Assets/loading....gif";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login, checkAuth } from "../../Redux/userSlice";
 import Input from "../Input";
 const { VITE_BACKEND_LINK } = import.meta.env;
 
@@ -17,6 +19,7 @@ const Form = (props) => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[0-9])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -32,7 +35,8 @@ const Form = (props) => {
         );
         response = response.data;
         if (response.bool) {
-          localStorage.setItem('User', JSON.stringify(response.users));
+          dispatch(login(response.users));
+          dispatch(checkAuth());
           navigate("/");
         } else {
           setMessage(response.msg);

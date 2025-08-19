@@ -78,7 +78,7 @@ export default function Dashboard() {
         console.log('Series data:', seriesData);
         console.log('Movies data:', moviesData);
         
-        const allAnimes = [...(seriesData || []), ...(moviesData || [])];
+        const allAnimes = [...(seriesData.series || []), ...(moviesData.movies || [])];
         console.log('All animes count:', allAnimes.length);
         
         const topAnimes = allAnimes

@@ -64,12 +64,10 @@ export const episodeSlice=createSlice({
     name:'episode',
     initialState,
     reducers:{
-        set_files:(state,action)=>setFiles(state,action),
         set_Episode:(state,action)=>set_episode(state,action)
     },
     extraReducers:(builder)=>{
         builder.addCase(fetchReviews.fulfilled,(state,action)=>{
-            console.log('Done')
             state.reviews=action.payload.reviews;
             state.id=action.payload._id
             state.likes=action.payload.likes
@@ -84,5 +82,5 @@ export const episodeSlice=createSlice({
     }
 })
 
-export const{set_files,set_Episode}=episodeSlice.actions;
+export const{set_Episode}=episodeSlice.actions;
 export default episodeSlice.reducer;

@@ -25,7 +25,7 @@
 
 const express = require("express");
 const router = express.Router();
-const { refreshToken, validateAnime, validateEditUser } = require("../middleware");
+const { refreshToken, validateAnime, validateEditUser, validateUploadPermission } = require("../middleware");
 const {
   handleFetchSeries,
   handleFetchMovies,
@@ -109,7 +109,7 @@ router.post("/delete_anime", refreshToken, handleDeleteAnime);
  *       200:
  *         description: Anime edited successfully
  */
-router.post("/edit_anime", refreshToken,validateAnime,validateEditUser,handleEditAnime);
+router.post("/edit_anime", refreshToken, validateUploadPermission, validateAnime, validateEditUser, handleEditAnime);
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.post("/edit_anime", refreshToken,validateAnime,validateEditUser,handleEdi
  *       200:
  *         description: Anime added successfully
  */
-router.post("/add_anime", refreshToken,validateAnime, handleAddAnime);
+router.post("/add_anime", refreshToken, validateUploadPermission, validateAnime, handleAddAnime);
 
 /**
  * @swagger

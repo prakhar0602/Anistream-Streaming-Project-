@@ -425,9 +425,20 @@ const handleGetAllUsers = async(req,res) => {
 const handleGetContentCreators = async(req,res) => {
     try{
         const creators = await user.find({type: 'cc'}).select('username email profile_image');
+        
+        // Get online creator emails
+        const onlineUsers = await OnlineUsers.find();
+        const onlineCreatorEmails = [];
+        for(const onlineUser of onlineUsers) {
+            const userInfo = await user.findOne({email: onlineUser.email, type: 'cc'});
+            if(userInfo) onlineCreatorEmails.push(onlineUser.email);
+        }
+        
+        // Calculate content stats for each creator
         const creatorStats = await Promise.all(creators.map(async (creator) => {
             const seriesCount = await Series.countDocuments({uploadedBy: creator._id});
             const moviesCount = await Movies.countDocuments({uploadedBy: creator._id});
+            
             return {
                 ...creator.toObject(),
                 seriesCount,
@@ -436,10 +447,16 @@ const handleGetContentCreators = async(req,res) => {
             };
         }));
         
+        // Get total content (including content with no owner)
+        const totalSeries = await Series.countDocuments();
+        const totalMovies = await Movies.countDocuments();
+
         res.status(200).json({
             bool: true,
             creators: creatorStats,
-            totalCreators: creators.length
+            totalCreators: creators.length,
+            activeCreators: onlineCreatorEmails.length,
+            totalContent: totalSeries + totalMovies
         });
     }
     catch(e){

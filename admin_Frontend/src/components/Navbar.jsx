@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Brain, Eye, UserPlus, Settings } from "lucide-react";
+import { Home, Users, Brain, Eye, UserPlus } from "lucide-react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -22,8 +22,14 @@ export default function Sidebar() {
         console.error('Failed to fetch admin user:', error);
       }
     };
-    fetchAdminUser();
-  }, []);
+    
+    // Add delay for dashboard route to ensure cookies are set
+    if (location.pathname === '/dashboard') {
+      setTimeout(fetchAdminUser, 100);
+    } else {
+      fetchAdminUser();
+    }
+  }, [location.pathname]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -35,6 +41,7 @@ export default function Sidebar() {
       });
       const data = await response.json();
       if (data.bool) {
+        setAdminUser({ username: 'Admin' });
         navigate('/login');
       }
     } catch (error) {
@@ -67,10 +74,7 @@ export default function Sidebar() {
             <Eye size={20} className="text-white"/>
             <span className="text-white">Users</span>
           </div>
-          <div className="flex items-center space-x-3 p-3 rounded-lg opacity-70">
-            <Settings size={20} className="text-white"/>
-            <span className="text-white">Settings</span>
-          </div>
+
         </div>
       </div>
       <div className="relative">

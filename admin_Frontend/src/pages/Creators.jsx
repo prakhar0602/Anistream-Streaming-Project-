@@ -5,6 +5,8 @@ import { Eye, Film, Tv } from 'lucide-react';
 export default function Creators() {
   const [creators, setCreators] = useState([]);
   const [totalCreators, setTotalCreators] = useState(0);
+  const [activeCreators, setActiveCreators] = useState(0);
+  const [totalContent, setTotalContent] = useState(0);
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [creatorContent, setCreatorContent] = useState({ series: [], movies: [] });
   const [loading, setLoading] = useState(true);
@@ -22,6 +24,8 @@ export default function Creators() {
       if (data.bool) {
         setCreators(data.creators);
         setTotalCreators(data.totalCreators);
+        setActiveCreators(data.activeCreators || 0);
+        setTotalContent(data.totalContent || 0);
       }
     } catch (error) {
       console.error('Failed to fetch content creators:', error);
@@ -49,7 +53,7 @@ export default function Creators() {
     fetchCreatorContent(creator._id);
   };
 
-  const activeCreators = creators.filter(creator => creator.totalContent > 0).length;
+
 
   if (loading) {
     return (
@@ -79,7 +83,7 @@ export default function Creators() {
           <div className="bg-gray-800 p-4 rounded-lg">
             <h3 className="text-white font-medium mb-2">Total Content</h3>
             <p className="text-2xl font-bold text-purple-400">
-              {creators.reduce((sum, creator) => sum + creator.totalContent, 0)}
+              {totalContent}
             </p>
           </div>
         </div>

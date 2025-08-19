@@ -1,74 +1,38 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../Assets/icon.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { checkAuth, logout } from "../../Redux/userSlice";
 import { toast } from "react-toastify";
+import axios from "axios";
 const { VITE_BACKEND_LINK } = import.meta.env;
 const Nav = () => {
   const location = useLocation();
-  let navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  let [isLoggedIn, setLoggedIn] = useState(null);
-  let [query, setQuery] = useState("");
-  let [menuOpen, setMenuOpen] = useState(false);
-  let [profileDropdown, setProfileDropdown] = useState(false);
-  let [userProfile, setUserProfile] = useState(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isLoggedIn, userProfile, loading } = useSelector(state => state.user);
+  
+  console.log('Navbar state:', { user, isLoggedIn, userProfile, loading });
+  const [query, setQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileDropdown, setProfileDropdown] = useState(false);
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const storedUser = localStorage.getItem('User');
-        if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          setUser(userData);
-          
-          let response = await axios.get(`${VITE_BACKEND_LINK}/verify_token`, {
-            withCredentials: true,
-          });
-          response = response.data;
-          setLoggedIn(response);
-          
-          if (response.bool) {
-            try {
-              const profileResponse = await axios.get(`${VITE_BACKEND_LINK}/user_profile`, {
-                withCredentials: true,
-              });
-              if (profileResponse.data.bool && profileResponse.data.user) {
-                setUserProfile(profileResponse.data.user);
-              }
-            } catch (error) {
-              console.error('Error fetching user profile:', error);
-            }
-          }
-        } else {
-          setLoggedIn({ bool: false });
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setLoggedIn({ bool: false });
-      }
-    }
-    checkAuth();
-  }, []);
+    dispatch(checkAuth());
+  }, [dispatch]);
 
   function changeURL(l) {
     navigate(l);
   }
   async function logout1() {
     try {
-      let response = await axios.get(`${VITE_BACKEND_LINK}/logout`, {
+      await axios.get(`${VITE_BACKEND_LINK}/logout`, {
         withCredentials: true,
       });
-      response = response.data.bool;
-      if (response) {
-        localStorage.removeItem('User');
-        setLoggedIn({ bool: false });
-        setUser(null);
-        setUserProfile(null);
-        navigate('/login');
-      }
     } catch (error) {
       console.error('Logout failed:', error);
     }
+    dispatch(logout());
+    navigate('/login');
   }
   async function search() {
     if (!query.trim()) {
@@ -211,7 +175,7 @@ const Nav = () => {
             </button>
           </li>
           {
-            user && user.type==="admin"?(
+            user && (user.type==="admin" || user.type==="cc")?(
             <li>
             <button onClick={()=>changeURL("/upload")} >
               <div className="flex gap-5 hover:text-white">
@@ -226,7 +190,7 @@ const Nav = () => {
         </ul>
       </div>
       <div className="text-2xl flex text-[#8f8f8f] relative">
-        {isLoggedIn && isLoggedIn.bool ? (
+        {isLoggedIn?.bool ? (
           <div className="relative">
             <div 
               className="flex gap-5 hover:text-white cursor-pointer"

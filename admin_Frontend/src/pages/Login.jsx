@@ -26,7 +26,8 @@ export default function Login() {
       const data = await response.json();
 
       if (data.bool && data.users.type === 'admin') {
-        navigate('/dashboard');
+        // Small delay to ensure cookies are set before navigation
+        setTimeout(() => navigate('/dashboard'), 50);
       } else {
         setError('Admin access required');
       }
