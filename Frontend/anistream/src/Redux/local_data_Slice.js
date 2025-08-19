@@ -19,7 +19,7 @@ function load_data(){
 let initialState=load_data();
 
 
-// Defining the selected Anime
+
 function set_selected(state,action){
     state.selected_anime=action.payload;
     localStorage.setItem('local_data',JSON.stringify(state))

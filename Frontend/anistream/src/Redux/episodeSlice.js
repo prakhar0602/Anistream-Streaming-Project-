@@ -53,8 +53,7 @@ function set_episode(state,action){
             });
             return response.data.reviews;
           } catch (error) {
-            console.error('Error fetching reviews:', error);
-            // Handle the error appropriately
+            // Error handled
           }
         }
       );

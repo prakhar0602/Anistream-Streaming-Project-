@@ -26,7 +26,7 @@ function login1(state,action){
         localStorage.setItem('User',JSON.stringify(action.payload));
     }
     catch(e){
-        console.log(e)
+        // Error handled
     }
 }
 export const checkAuth = createAsyncThunk('user/checkAuth', async () => {
@@ -54,13 +54,12 @@ export const checkAuth = createAsyncThunk('user/checkAuth', async () => {
                     userProfile = profileResponse.data.user;
                 }
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                // Error handled
             }
         }
         
         return { isLoggedIn, user: userData, userProfile };
     } catch (error) {
-        console.error('Auth check failed:', error);
         return { isLoggedIn: { bool: false }, user: null, userProfile: null };
     }
 });

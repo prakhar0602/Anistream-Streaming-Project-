@@ -12,7 +12,7 @@ const FolderCreation = ({ user }) => {
   async function folder_creation(e) {
     e.preventDefault();
 
-    if (user.type !== "admin") {
+    if (user.type == "user" ) {
       toast.warning("Request Rejected", { position: "top-center" });
       return;
     }
