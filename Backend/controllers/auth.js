@@ -36,7 +36,9 @@ const handleAddUser = async (req, res) => {
 const handleVerifyToken = async(req,res)=>{
     try{
         let {refreshToken} = req.cookies
+        console.log(refreshToken)
         let {type} = jwt.verify(refreshToken,"Prakhar_Gupta")
+        console.log(type)
         if(type)
             res.json({bool:true,type})
         else
