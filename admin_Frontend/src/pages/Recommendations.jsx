@@ -30,7 +30,7 @@ export default function Recommendations() {
           <p className="text-gray-300 mb-4">
             Monitor and manage the machine learning recommendation system for personalized content delivery.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gray-700 p-4 rounded-lg">
               <h3 className="text-white font-medium mb-2">System Status</h3>
               <p className="text-green-400">Active</p>
@@ -49,6 +49,15 @@ export default function Recommendations() {
                   {isTraining ? 'Training...' : 'Train Now'}
                 </button>
               </div>
+            </div>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="text-white font-medium mb-2">Training Data</h3>
+              <button 
+                onClick={() => window.open('http://localhost:8080/download_csv', '_blank')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+              >
+                Download CSV
+              </button>
             </div>
           </div>
         </div>

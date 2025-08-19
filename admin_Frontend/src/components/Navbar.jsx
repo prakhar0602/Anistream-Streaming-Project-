@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Brain, ArrowDownToLine, ArrowUpFromLine, Settings } from "lucide-react";
+import { Home, Users, Brain, ArrowDownToLine, UserPlus, Settings } from "lucide-react";
 
-export default function Navbar() {
+export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [adminUser, setAdminUser] = useState({ username: 'Admin' });
@@ -43,82 +43,60 @@ export default function Navbar() {
   };
 
   return (
-    <>
-      {/* Top Header */}
-      <div className="flex justify-between items-center p-6 pb-0">
-        <div className="text-2xl font-bold text-white">anistream</div>
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-300"></div>
-            <span>{adminUser.username}</span>
-            <div className="relative">
-              <div 
-                className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:bg-red-600 transition-colors"
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
-                D
-              </div>
-              {showDropdown && (
-                <div className="absolute top-12 right-0 bg-gray-800 border border-gray-600 rounded-lg shadow-lg min-w-[150px] z-50">
-                  <button 
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-red-600 text-white flex items-center gap-2 rounded-lg"
-                  >
-                    <span>🚪</span>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+    <div className="w-64 bg-gray-800 h-screen flex flex-col justify-between p-6 flex-shrink-0">
+      <div>
+        <div className="text-2xl font-bold text-white mb-8">anistream</div>
+        <div className="space-y-4">
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/dashboard') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/dashboard')}>
+            <Home size={20} className="text-white"/>
+            <span className="text-white">Dashboard</span>
+          </div>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/users') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/users')}>
+            <Users size={20} className="text-white"/>
+            <span className="text-white">Users</span>
+          </div>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/recommendations') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/recommendations')}>
+            <Brain size={20} className="text-white"/>
+            <span className="text-white">Recommendations</span>
+          </div>
+          <div className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${isActive('/creators') ? 'bg-red-500' : 'hover:bg-gray-700'}`} onClick={() => navigate('/creators')}>
+            <UserPlus size={20} className="text-white"/>
+            <span className="text-white">Content Creators</span>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg opacity-70">
+            <ArrowDownToLine size={20} className="text-white"/>
+            <span className="text-white">Transactions</span>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg opacity-70">
+            <Settings size={20} className="text-white"/>
+            <span className="text-white">Settings</span>
           </div>
         </div>
       </div>
-      {showDropdown && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowDropdown(false)}
-        ></div>
-      )}
-    </>
-  );
-}
-
-export function Sidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isActive = (path) => location.pathname === path;
-
-  return (
-    <div className="w-20 flex flex-col items-center py-8 space-y-12">
-      <div className={`flex flex-col items-center cursor-pointer ${isActive('/dashboard') ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`} onClick={() => navigate('/dashboard')}>
-        <div className={`p-4 rounded-xl mb-2 ${isActive('/dashboard') ? 'bg-red-500' : 'hover:bg-white/10'}`}>
-          <Home size={24} className="text-white"/>
+      <div className="relative">
+        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer" onClick={() => setShowDropdown(!showDropdown)}>
+          <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+            {adminUser.username.charAt(0).toUpperCase()}
+          </div>
+          <span className="text-white">{adminUser.username}</span>
         </div>
-        <div className="text-xs text-center">Dashboard</div>
-      </div>
-      <div className={`flex flex-col items-center cursor-pointer ${isActive('/users') ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`} onClick={() => navigate('/users')}>
-        <div className={`p-4 rounded-xl mb-2 ${isActive('/users') ? 'bg-red-500' : 'hover:bg-white/10'}`}>
-          <Users size={24} className="text-white"/>
-        </div>
-        <div className="text-xs text-center">Users</div>
-      </div>
-      <div className={`flex flex-col items-center cursor-pointer ${isActive('/recommendations') ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`} onClick={() => navigate('/recommendations')}>
-        <div className={`p-4 rounded-xl mb-2 ${isActive('/recommendations') ? 'bg-red-500' : 'hover:bg-white/10'}`}>
-          <Brain size={24} className="text-white"/>
-        </div>
-        <div className="text-xs text-center leading-tight">Recommendation<br/>System</div>
-      </div>
-      <div className="flex flex-col items-center opacity-70">
-        <div className="p-4 rounded-xl mb-2"><ArrowUpFromLine size={24}/></div>
-        <div className="text-xs text-center">Deposit</div>
-      </div>
-      <div className="flex flex-col items-center opacity-70">
-        <div className="p-4 rounded-xl mb-2"><ArrowDownToLine size={24}/></div>
-        <div className="text-xs text-center">Transactions</div>
-      </div>
-      <div className="flex flex-col items-center opacity-70">
-        <div className="p-4 rounded-xl mb-2"><Settings size={24}/></div>
-        <div className="text-xs text-center">Settings</div>
+        {showDropdown && (
+          <div className="absolute bottom-full left-0 right-0 bg-gray-700 border border-gray-600 rounded-lg shadow-lg mb-2">
+            <button 
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 hover:bg-red-600 text-white flex items-center gap-2 rounded-lg"
+            >
+              <span>🚪</span>
+              Logout
+            </button>
+          </div>
+        )}
+        {showDropdown && (
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setShowDropdown(false)}
+          ></div>
+        )}
       </div>
     </div>
   );

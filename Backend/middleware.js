@@ -9,6 +9,9 @@ const refreshToken = async (req,res,next)=>{
     try{
         let token = req.cookies.accessToken;
         let refreshToken = req.cookies.refreshToken;
+        if(refreshToken==undefined){
+            return res.json({bool:false})
+        }
         let currents = await Online_Users.find({token:refreshToken})
         for(let current of currents){
             if(token==undefined && Date.now()<=current.expiryTime){

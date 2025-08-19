@@ -42,7 +42,8 @@ const  {
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
     handleGetUserProfile,
-    handleEditProfile
+    handleEditProfile,
+    handleDownloadCSV
 } = require('../controllers/auth')
 
 /**
@@ -412,5 +413,26 @@ router.get('/user_profile', refreshToken, handleGetUserProfile)
  *         description: Authentication required
  */
 router.put('/edit_profile', refreshToken, handleEditProfile)
+
+/**
+ * @swagger
+ * /download_csv:
+ *   get:
+ *     summary: Download training data CSV (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: CSV file downloaded successfully
+ *         content:
+ *           text/csv:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/download_csv', refreshToken, validateAdmin, handleDownloadCSV)
 
 module.exports = router;

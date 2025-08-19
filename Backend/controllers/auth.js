@@ -357,6 +357,22 @@ const handleGetOnlineUsers = async(req,res) => {
     }
 }
 
+const handleDownloadCSV = async(req,res) => {
+    try{
+        const axios = require('axios');
+        const response = await axios.get(`http://localhost:5000/api/download_csv`, {
+            responseType: 'stream'
+        });
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="updated_anime_list.csv"');
+        response.data.pipe(res);
+    }
+    catch(e){
+        res.status(500).json({bool:false, msg:'Failed to download CSV'});
+    }
+}
+
 const handleGetUserProfile = async(req,res) => {
     try{
         const {refreshToken} = req.cookies;
@@ -422,5 +438,6 @@ module.exports = {
     handleGetViewedAnalytics,
     handleGetOnlineUsers,
     handleGetUserProfile,
-    handleEditProfile
+    handleEditProfile,
+    handleDownloadCSV
 }
