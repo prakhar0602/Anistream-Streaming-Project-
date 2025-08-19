@@ -12,8 +12,10 @@ class RecommendationController:
         return "Model loaded successfully!"
     
     def training(self):
+        print("Started")
         new_data = request.get_json(force=True)
         result = self.data_service.add_training_data(new_data)
+        print("End")
         return jsonify(result)
     
     def get_recommendation(self):
